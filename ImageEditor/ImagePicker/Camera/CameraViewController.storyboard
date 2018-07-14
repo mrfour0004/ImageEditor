@@ -23,7 +23,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="1Uz-cX-47e">
-                                        <rect key="frame" x="0.0" y="519" width="375" height="128"/>
+                                        <rect key="frame" x="0.0" y="507" width="375" height="128"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bMB-uj-9Av">
                                                 <rect key="frame" x="0.0" y="0.0" width="1" height="128"/>
@@ -32,7 +32,7 @@
                                                     <constraint firstAttribute="width" constant="1" id="ZBY-UX-Qav"/>
                                                 </constraints>
                                             </view>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FEf-f9-J9Y">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FEf-f9-J9Y" customClass="CameraButton" customModule="ImageEditor" customModuleProvider="target">
                                                 <rect key="frame" x="51.5" y="40" width="48" height="48"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" secondItem="FEf-f9-J9Y" secondAttribute="height" multiplier="1:1" id="ZMi-1j-lOZ"/>
@@ -51,7 +51,7 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="76" height="76"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
-                                                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8PT-gR-p7y">
+                                                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8PT-gR-p7y" customClass="CameraButton" customModule="ImageEditor" customModuleProvider="target">
                                                             <rect key="frame" x="10" y="10" width="56" height="56"/>
                                                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <constraints>
@@ -82,7 +82,7 @@
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                             </visualEffectView>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eX6-0R-eVV">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eX6-0R-eVV" customClass="CameraButton" customModule="ImageEditor" customModuleProvider="target">
                                                 <rect key="frame" x="276" y="40" width="48" height="48"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="48" id="DDT-na-NDN"/>
@@ -109,11 +109,15 @@
                                     </stackView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <gestureRecognizers/>
                                 <constraints>
                                     <constraint firstItem="1Uz-cX-47e" firstAttribute="leading" secondItem="bCk-Bu-exr" secondAttribute="leading" id="UI2-P4-zMZ"/>
                                     <constraint firstAttribute="trailing" secondItem="1Uz-cX-47e" secondAttribute="trailing" id="o3n-tD-dwT"/>
-                                    <constraint firstAttribute="bottom" secondItem="1Uz-cX-47e" secondAttribute="bottom" constant="20" id="saX-Pv-NbJ"/>
+                                    <constraint firstAttribute="bottom" secondItem="1Uz-cX-47e" secondAttribute="bottom" constant="32" id="saX-Pv-NbJ"/>
                                 </constraints>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="niv-Fa-C8Z" appends="YES" id="Mcv-Qo-MIe"/>
+                                </connections>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -132,6 +136,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KwY-1P-yA6" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="niv-Fa-C8Z">
+                    <connections>
+                        <action selector="didTapPreviewView:" destination="HXi-yu-31h" id="iAD-1H-hKV"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="-316" y="-97"/>
         </scene>

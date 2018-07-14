@@ -22,6 +22,8 @@
 		5EC3F00320F9C391001D811D /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC3F00220F9C391001D811D /* Images.swift */; };
 		5EDE5E6820F9C99D00614CE9 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */; };
 		5EDE5E6A20F9CF9800614CE9 /* FlashMode+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */; };
+		5EDE5E6E20F9F06E00614CE9 /* CameraButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6D20F9F06E00614CE9 /* CameraButton.swift */; };
+		5EDE5E7020F9FD8C00614CE9 /* FocusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6F20F9FD8C00614CE9 /* FocusView.swift */; };
 		DB182E08BBDE7330D3AD153C /* Pods_ImageEditor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C7AC425D0343A0001628AC1 /* Pods_ImageEditor.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +46,8 @@
 		5EC3F00220F9C391001D811D /* Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
 		5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlashMode+UIImage.swift"; sourceTree = "<group>"; };
+		5EDE5E6D20F9F06E00614CE9 /* CameraButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraButton.swift; sourceTree = "<group>"; };
+		5EDE5E6F20F9FD8C00614CE9 /* FocusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusView.swift; sourceTree = "<group>"; };
 		8C7AC425D0343A0001628AC1 /* Pods_ImageEditor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ImageEditor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB7723002F48BED069706D5D /* Pods-ImageEditor.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ImageEditor.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ImageEditor/Pods-ImageEditor.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,6 +82,7 @@
 				5E5894D420F0866700193CEB /* PhotoCaptureProcessor.swift */,
 				5E5894D620F0C22F00193CEB /* AVCaptureVideoOrientation+UIOrientation.swift */,
 				5E5894D820F0C25C00193CEB /* AVCaptureDevice+Extension.swift */,
+				5EDE5E6F20F9FD8C00614CE9 /* FocusView.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -136,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				5EC3F00220F9C391001D811D /* Images.swift */,
+				5EDE5E6D20F9F06E00614CE9 /* CameraButton.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -280,7 +286,9 @@
 				5E35539920E75B140089F433 /* AppDelegate.swift in Sources */,
 				5E5894D920F0C25C00193CEB /* AVCaptureDevice+Extension.swift in Sources */,
 				5EDE5E6820F9C99D00614CE9 /* UIImage+Extension.swift in Sources */,
+				5EDE5E7020F9FD8C00614CE9 /* FocusView.swift in Sources */,
 				5E5894CD20EFACB600193CEB /* CameraViewController.swift in Sources */,
+				5EDE5E6E20F9F06E00614CE9 /* CameraButton.swift in Sources */,
 				5E5894D120EFC19000193CEB /* LegacyCameraViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

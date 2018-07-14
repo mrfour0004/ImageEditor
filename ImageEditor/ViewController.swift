@@ -25,7 +25,6 @@ class ViewController: UIViewController {
         let viewController = UIStoryboard.init(name: "CameraViewController", bundle: nil).instantiateInitialViewController() as! CameraViewController
         viewController.photoCapturedHandler = { [unowned self] image in
             self.imageView.image = image
-            print(image.size)
         }
         present(viewController, animated: true, completion: nil)
     }

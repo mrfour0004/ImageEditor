@@ -29,17 +29,18 @@ class CameraViewController: UIViewController {
     private var videoDeviceInput: AVCaptureDeviceInput!
 
     @IBOutlet private weak var previewView: PreviewView!
-    @IBOutlet private weak var flashButton: UIButton!
-    @IBOutlet private weak var libraryButton: UIButton!
+    @IBOutlet private weak var flashButton: CameraButton!
+    @IBOutlet private weak var libraryButton: CameraButton!
 
     // MARK: - Capturing photos
 
-    private var flashMode: AVCaptureDevice.FlashMode = .auto {
+    private var flashMode: AVCaptureDevice.FlashMode = .off {
         didSet {
             updateFlashButton()
         }
     }
     private var photoOutput: AVCaptureStillImageOutput!
+    private weak var focusView: FocusView?
     var photoCapturedHandler: ((UIImage) -> Void)?
 
     @IBAction private func didClickShutterButton(_ sender: Any) {
@@ -50,11 +51,21 @@ class CameraViewController: UIViewController {
     }
 
     @IBAction private func didClickLibraryButton(_ sender: Any) {
-        
+        presentImagePickerController()
     }
 
     @IBAction private func didClickFlashButton(_ button: UIButton) {
         flashMode.swith()
+    }
+
+    @IBAction private func didTapPreviewView(_ gestureRecognizer: UITapGestureRecognizer) {
+        let devicePoint = previewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: gestureRecognizer.location(in: gestureRecognizer.view))
+        focus(with: .autoFocus, exposureMode: .autoExpose, at: devicePoint, monitorSubjectAreaChange: true)
+        
+        if let gestureView = gestureRecognizer.view {
+            focusView?.dismiss()
+            focusView = FocusView().show(on: gestureView, atPoint: gestureRecognizer.location(in: gestureView))
+        }
     }
 
     private func updateFlashButton() {
@@ -81,6 +92,14 @@ class CameraViewController: UIViewController {
         // the main thread and session configuration is done on the session queue.
         //
         let videoPreviewLayerOrientation = previewView.videoPreviewLayer.connection?.videoOrientation
+
+        UIView.transition(with: previewView, duration: 0.1, options: [.curveEaseInOut], animations: {
+            self.previewView.alpha = 0
+        }, completion: { _ in
+            UIView.transition(with: self.previewView, duration: 0.1, options: [.curveEaseInOut], animations: {
+                self.previewView.alpha = 1
+            }, completion: nil)
+        })
 
         sessionQueue.async {
             let connect = self.photoOutput.connection(with: .video)!
@@ -313,6 +332,28 @@ private extension CameraViewController {
             $0.invalidate()
         }
         keyValueObservations.removeAll()
+    }
+}
+
+// MARK: - UIImagePickerControllerDelegate Methods
+
+extension CameraViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    private func presentImagePickerController() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+
+        self.present(imagePicker, animated: true, completion: nil)
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let image = info[UIImagePickerControllerOriginalImage] as! UIImage
+        self.photoCapturedHandler?(image)
+        self.presentingViewController?.dismiss(animated: true, completion: nil)
     }
 }
 
