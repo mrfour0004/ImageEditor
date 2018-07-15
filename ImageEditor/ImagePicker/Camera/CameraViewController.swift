@@ -51,7 +51,9 @@ class CameraViewController: UIViewController {
     }
 
     @IBAction private func didClickLibraryButton(_ sender: Any) {
-        presentImagePickerController()
+        DispatchQueue.main.async {
+            self.presentImagePickerController()
+        }
     }
 
     @IBAction private func didClickFlashButton(_ button: UIButton) {
@@ -69,20 +71,28 @@ class CameraViewController: UIViewController {
     }
 
     private func updateFlashButton() {
-        let height = LayoutConfig.flashIconSize.height
-        UIView.transition(with: flashButton, duration: 0.3, options: [.curveEaseIn, .transitionCrossDissolve], animations: {
-            self.flashButton.setImage(self.flashMode.icon.resize(toHeight: height)?.tint(with: .white), for: .normal)
-            self.flashButton.setImage(self.flashMode.icon.resize(toHeight: height)?.tint(with: .white), for: .highlighted)
-        }, completion: nil)
+        let fakeButton = flashButton.snapshotView(afterScreenUpdates: false)!
+        view.addSubview(fakeButton)
+        fakeButton.frame = flashButton.superview!.convert(flashButton.frame, to: view)
 
-        if #available(iOS 10.0, *) {
-            UIViewPropertyAnimator(duration: 0.3, curve: .easeInOut) {
-                for _ in 0...1 { // make a 360 degree rotation
-                    let transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
-                    self.flashButton.transform = self.flashButton.transform.concatenating(transform)
-                }
-            }.startAnimation()
-        }
+        UIView.transition(with: fakeButton, duration: 0.25, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
+            fakeButton.alpha = 0
+            fakeButton.transform = CGAffineTransform(rotationAngle: CGFloat(90) * CGFloat.pi / 180)
+        }, completion: { _ in
+            fakeButton.removeFromSuperview()
+        })
+
+        flashButton.alpha = 0
+        flashButton.transform = CGAffineTransform(scaleX: 0.1, y: 0.1)
+
+        let height = LayoutConfig.flashIconSize.height
+        flashButton.setImage(self.flashMode.icon.resize(toHeight: height)?.tint(with: .white), for: .normal)
+        flashButton.setImage(self.flashMode.icon.resize(toHeight: height)?.tint(with: .white), for: .highlighted)
+
+        UIView.animate(withDuration: 0.4, delay: 0.05, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: [.curveEaseInOut, .beginFromCurrentState, .allowUserInteraction], animations: {
+            self.flashButton.transform = .identity
+            self.flashButton.alpha = 1
+        }, completion: nil)
     }
 
     private func capturePhoto(completion: @escaping (_ image: UIImage) -> Void) {
@@ -207,7 +217,7 @@ class CameraViewController: UIViewController {
 private extension CameraViewController {
 
     func setupViews() {
-        view.backgroundColor = .clear
+        view.backgroundColor = .black
 
         setupButton(flashButton, image: flashMode.icon)
         setupButton(libraryButton, image: .photoLibrary)

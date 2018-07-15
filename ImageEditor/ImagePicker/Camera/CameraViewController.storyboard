@@ -120,7 +120,6 @@
                                 </connections>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="bCk-Bu-exr" firstAttribute="leading" secondItem="ZxA-gf-eJe" secondAttribute="leading" id="Lec-dp-91i"/>
                             <constraint firstItem="bCk-Bu-exr" firstAttribute="centerY" secondItem="JJd-1g-HV4" secondAttribute="centerY" id="bdd-0z-DAd"/>
