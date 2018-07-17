@@ -44,9 +44,9 @@ class CameraViewController: UIViewController {
     var photoCapturedHandler: ((UIImage) -> Void)?
 
     @IBAction private func didClickShutterButton(_ sender: Any) {
-        capturePhoto { image in 
-            self.photoCapturedHandler?(image)
-            self.dismiss(animated: true, completion: nil)
+        capturePhoto { [unowned self] image in
+            guard let imagePicker = self.navigationController as? ImagePickerController else { return }
+            imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: image)
         }
     }
 
@@ -173,6 +173,9 @@ class CameraViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
+        navigationController?.setNavigationBarHidden(true, animated: false)
+
         sessionQueue.async {
             switch self.setupResult {
             case .success:
@@ -362,8 +365,9 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         let image = info[UIImagePickerControllerOriginalImage] as! UIImage
-        self.photoCapturedHandler?(image)
-        self.presentingViewController?.dismiss(animated: true, completion: nil)
+
+        guard let imagePicker = navigationController as? ImagePickerController else { return }
+        imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: image)
     }
 }
 

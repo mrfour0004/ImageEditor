@@ -22,11 +22,10 @@ class ViewController: UIViewController {
     }
 
     @IBAction private func presentCameraViewController(_ sender: Any) {
-        let viewController = UIStoryboard.init(name: "CameraViewController", bundle: nil).instantiateInitialViewController() as! CameraViewController
-        viewController.photoCapturedHandler = { [unowned self] image in
-            self.imageView.image = image
-        }
-        present(viewController, animated: true, completion: nil)
+        let picker = ImagePickerController()
+        picker.pickerDelegate = self
+
+        present(picker, animated: true, completion: nil)
     }
 
     @objc func dismissSelf() {
@@ -51,6 +50,17 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
 
     func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
 
+    }
+}
+
+extension ViewController: ImagePickerControllerDelegate {
+    func imagePicker(_ picker: ImagePickerController, didFinishPickingImage image: UIImage) {
+        imageView.image = image
+        picker.dismiss(animated: true, completion: nil)
+    }
+
+    func imagePickerDidCancel(_ picker: ImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
     }
 }
 
