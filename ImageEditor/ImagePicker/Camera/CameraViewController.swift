@@ -9,7 +9,7 @@
 import UIKit
 import AVFoundation
 
-class CameraViewController: UIViewController {
+class CameraViewController: UIViewController, StoryboardLoadable {
 
     // MARK: - Session Management
 
@@ -46,7 +46,14 @@ class CameraViewController: UIViewController {
     @IBAction private func didClickShutterButton(_ sender: Any) {
         capturePhoto { [unowned self] image in
             guard let imagePicker = self.navigationController as? ImagePickerController else { return }
-            imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: image)
+            
+            if imagePicker.allowsEditing {
+                let imageEditorViewController = ImageEditorViewController.instantiateFromStoryboard()
+                imageEditorViewController.image = image
+                imagePicker.pushViewController(imageEditorViewController, animated: true)
+            } else {
+                imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: image)
+            }
         }
     }
 
@@ -173,8 +180,6 @@ class CameraViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        navigationController?.setNavigationBarHidden(true, animated: false)
 
         sessionQueue.async {
             switch self.setupResult {
@@ -367,7 +372,16 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
         let image = info[UIImagePickerControllerOriginalImage] as! UIImage
 
         guard let imagePicker = navigationController as? ImagePickerController else { return }
-        imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: image)
+
+        if imagePicker.allowsEditing {
+            let imageEditorViewController = ImageEditorViewController.instantiateFromStoryboard()
+            imageEditorViewController.image = image
+            imagePicker.pushViewController(imageEditorViewController, animated: false)
+
+            picker.dismiss(animated: true, completion: nil)
+        } else {
+            imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: image)
+        }
     }
 }
 

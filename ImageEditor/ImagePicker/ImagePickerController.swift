@@ -25,7 +25,42 @@ class ImagePickerController: UINavigationController {
     // MARK: - View Lifecycle
 
     convenience init() {
-        let viewController = UIStoryboard.init(name: "CameraViewController", bundle: nil).instantiateInitialViewController() as! CameraViewController
-        self.init(rootViewController: viewController)
+        self.init(rootViewController: CameraViewController.instantiateFromStoryboard())
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        delegate = self
+        interactivePopGestureRecognizer?.delegate = self
+    }
+}
+
+// MARK: - UINavigationControllerDelegate Methods
+
+extension ImagePickerController: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
+        navigationController.setNavigationBarHidden(needsHideNavigationBarWhenShowing(viewController), animated: false)
+    }
+
+    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        navigationController.setNavigationBarHidden(needsHideNavigationBarWhenShowing(toVC), animated: true)
+        return nil
+    }
+
+    private func needsHideNavigationBarWhenShowing(_ viewController: UIViewController) -> Bool{
+        switch viewController {
+        case is CameraViewController, is ImageEditorViewController:
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate Methods
+
+extension ImagePickerController: UIGestureRecognizerDelegate {
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        return viewControllers.count > 1
     }
 }

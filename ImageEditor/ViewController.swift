@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 import CLImageEditor
 
 class ViewController: UIViewController {
@@ -24,6 +25,7 @@ class ViewController: UIViewController {
     @IBAction private func presentCameraViewController(_ sender: Any) {
         let picker = ImagePickerController()
         picker.pickerDelegate = self
+        picker.allowsEditing = true
 
         present(picker, animated: true, completion: nil)
     }
@@ -31,6 +33,7 @@ class ViewController: UIViewController {
     @objc func dismissSelf() {
         dismiss(animated: true, completion: nil)
     }
+    
 }
 
 extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -56,11 +59,11 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
 extension ViewController: ImagePickerControllerDelegate {
     func imagePicker(_ picker: ImagePickerController, didFinishPickingImage image: UIImage) {
         imageView.image = image
-        picker.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
 
     func imagePickerDidCancel(_ picker: ImagePickerController) {
-        picker.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
 }
 
