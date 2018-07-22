@@ -16,6 +16,22 @@ class CropScrollView: UIScrollView {
     var touchesCancelled: (() -> Void)?
     var touchesEnded: (() -> Void)?
 
+    // MARK: - Lifecycle
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        if #available(iOS 11.0, *) {
+            contentInsetAdjustmentBehavior = .never
+        }
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    // MARK: - Touches Methods
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchesBegan?()
         super.touchesBegan(touches, with: event)

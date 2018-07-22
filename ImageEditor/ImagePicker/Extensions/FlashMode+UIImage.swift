@@ -22,7 +22,7 @@ extension AVCaptureDevice.FlashMode {
     }
 
     /// Switch to the next `FlashMode`.
-    mutating func swith() {
+    mutating func `switch`() {
         guard let newMode = AVCaptureDevice.FlashMode(rawValue: (rawValue + 1) % 3) else { return }
         self = newMode
     }

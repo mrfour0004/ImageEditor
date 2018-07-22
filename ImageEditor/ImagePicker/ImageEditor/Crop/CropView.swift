@@ -174,11 +174,17 @@ class CropView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    @available(iOS 11.0, *)
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        layoutInitialImage()
+    }
+
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
 
         guard superview != nil else { return }
-
+        
         layoutInitialImage()
 
         //If the angle value was previously set before this point, apply it now

@@ -176,9 +176,9 @@
 		5E8BC5EF20FDF29C00C0AFD4 /* Crop */ = {
 			isa = PBXGroup;
 			children = (
+				5E10B8D321000E3D00E8838C /* CropOverlayView.swift */,
 				5E10B8CF20FF832400E8838C /* CropScrollView.swift */,
 				5E10B8D120FF840500E8838C /* CropView.swift */,
-				5E10B8D321000E3D00E8838C /* CropOverlayView.swift */,
 			);
 			path = Crop;
 			sourceTree = "<group>";
