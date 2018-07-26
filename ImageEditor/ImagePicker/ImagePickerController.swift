@@ -49,7 +49,7 @@ extension ImagePickerController: UINavigationControllerDelegate {
 
     private func needsHideNavigationBarWhenShowing(_ viewController: UIViewController) -> Bool{
         switch viewController {
-        case is CameraViewController, is ImageEditorViewController:
+        case is CameraViewController:
             return true
         default:
             return false

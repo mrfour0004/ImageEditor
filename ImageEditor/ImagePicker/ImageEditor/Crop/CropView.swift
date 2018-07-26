@@ -79,8 +79,8 @@ class CropView: UIView {
 
     // MARK: - Properties - Rotation State
 
-    /// When performing 90-degree rotations, remember what our last manual size was to use that as a base
-    private var cropBoxLastEditedSize: CGSize?
+    /// When performing 90-degree rotations, remember what our last manual size was to use that as a base.
+    private var cropBoxLastEditedSize: CGSize = .zero
 
     /// Remember the zoom size when we last edited
     private lazy var cropBoxLastEditedZoomScale: CGFloat = scrollView.zoomScale
@@ -581,6 +581,135 @@ extension CropView {
         }
 
         cropBoxFrame = frame
+        checkForCanReset()
+    }
+
+    func rotateCropView(animated: Bool) {
+        guard !rotateAnimationInProgress else { return }
+
+        // Cancel any pending resizing timers
+        if resetTimer != nil {
+            cancelResetTimer()
+            setEditing(false, animated: false)
+            cropBoxLastEditedAngle = angle
+            captureStateForImageRotation()
+        }
+
+        angle = (angle + 90) % 360
+        let angleRadians = CGFloat(angle) * CGFloat.pi / CGFloat(180)
+        let rotation = CGAffineTransform(rotationAngle: angleRadians)
+
+        // Work out how much we'll need to scale everything to fit to the new rotation
+        let contentBounds = self.contentBounds
+        let cropBoxFrame = self.cropBoxFrame
+        let scale = min((contentBounds.width / cropBoxFrame.height), (contentBounds.height / cropBoxFrame.width))
+        
+        // Work out which section of the image we're currently focusing at
+        let cropMidPoint = CGPoint(x: cropBoxFrame.midX, y: cropBoxFrame.midY)
+        var cropTargetPoint = CGPoint(x: cropMidPoint.x + scrollView.contentOffset.x, y: cropMidPoint.y + scrollView.contentOffset.y)
+
+        //Work out the dimensions of the crop box when rotated
+        var newCropFrame: CGRect = .zero
+        if (labs(angle) == labs(cropBoxLastEditedAngle)) || (-labs(angle) == ((labs(cropBoxLastEditedAngle) - 180) % 360)) {
+            newCropFrame.size = cropBoxLastEditedSize
+            scrollView.minimumZoomScale = cropBoxLastEditedMinZoomScale
+            scrollView.zoomScale = cropBoxLastEditedZoomScale
+        } else {
+            newCropFrame.size = CGSize(width: floor(cropBoxFrame.height * scale), height: floor(cropBoxFrame.width * scale))
+
+            // Re-adjust the scrolling dimensions of the scroll view to match the new size
+            scrollView.minimumZoomScale *= scale
+            scrollView.zoomScale *= scale
+        }
+
+        newCropFrame.origin.x = floor(bounds.width - newCropFrame.width) * CGFloat(0.5)
+        newCropFrame.origin.y = floor(bounds.height - newCropFrame.height) * CGFloat(0.5)
+
+        // If we're animated, generate a snapshot view that we'll animate in place of the real view
+        var snapshotView: UIView? = nil
+        if animated {
+            snapshotView = foregroundContainerView.snapshotView(afterScreenUpdates: false)
+            snapshotView?.frame = foregroundContainerView.frame
+            rotateAnimationInProgress = true
+        }
+
+        // Rotate the background image view, inside its container view
+        backgroundImageView.transform = rotation
+
+        // Flip the width/height of the container view so it matches the rotated image view's size
+        let containerSize = backgroundContainerView.frame.size
+        backgroundContainerView.frame = CGRect(origin: .zero, size: CGSize(width: containerSize.height, height: containerSize.width))
+        backgroundImageView.frame = CGRect(origin: .zero, size: backgroundImageView.frame.size)
+
+        // Rotate the foreground image view to match
+        foregroundContainerView.transform = .identity
+        foregroundImageView.transform = rotation
+
+        // Flip the content size of the scroll view to match the rotated bounds
+        scrollView.contentSize = backgroundContainerView.frame.size
+
+        // assign the new crop box frame and re-adjust the content to fill it
+        self.cropBoxFrame = newCropFrame
+        moveCroppedContentToCenter(animated: false)
+        newCropFrame = self.cropBoxFrame;
+
+        // work out how to line up out point of interest into the middle of the crop box
+        cropTargetPoint.x *= scale
+        cropTargetPoint.y *= scale
+
+        // swap the target dimensions to match a 90 degree rotation (clockwise or counterclockwise)
+        let swap = cropTargetPoint.x
+        cropTargetPoint.x = scrollView.contentSize.width - cropTargetPoint.y
+        cropTargetPoint.y = swap
+
+        // reapply the translated scroll offset to the scroll view
+        let midPoint = CGPoint(x: newCropFrame.midX, y: newCropFrame.midY)
+        var offset: CGPoint = .zero
+        offset.x = floor(-midPoint.x + cropTargetPoint.x)
+        offset.y = floor(-midPoint.y + cropTargetPoint.y)
+        offset.x = max(-scrollView.contentInset.left, offset.x)
+        offset.y = max(-scrollView.contentInset.top, offset.y)
+
+        // if the scroll view's new scale is 1 and the new offset is equal to the old, will not trigger the delegate 'scrollViewDidScroll:'
+        // so we should call the method manually to update the foregroundImageView's frame
+        if (offset.x == scrollView.contentOffset.x) && (offset.y == scrollView.contentOffset.y) && (scale == 1) {
+           matchForegroundToBackground()
+        }
+        scrollView.contentOffset = offset
+
+        // if we're animated, play an animation of the snapshot view rotating, then fade it out over the live content
+        if let snapshotView = snapshotView, animated {
+            addSubview(snapshotView)
+
+            backgroundContainerView.isHidden = true
+            foregroundContainerView.isHidden = true
+            translucencyView.isHidden = true
+            gridOverlayView.isHidden = true
+            UIView.animate(withDuration: 0.45, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .beginFromCurrentState, animations: {
+                let rotationTransform = CGAffineTransform(rotationAngle: CGFloat.pi / 2)
+                let scaleTransform = CGAffineTransform(scaleX: scale, y: scale)
+                snapshotView.transform = rotationTransform.concatenating(scaleTransform)
+            }, completion: { _ in
+                self.backgroundContainerView.isHidden = false
+                self.foregroundContainerView.isHidden = false
+                self.translucencyView.isHidden = false
+                self.gridOverlayView.isHidden = false
+
+                self.backgroundContainerView.alpha = 0
+                self.gridOverlayView.alpha = 0
+                self.translucencyView.alpha = 1
+
+                UIView.animate(withDuration: 0.45, animations: {
+                    snapshotView.alpha = 0.0
+                    self.backgroundContainerView.alpha = 1.0
+                    self.gridOverlayView.alpha = 1.0
+                }, completion: { _ in
+                    self.rotateAnimationInProgress = false
+                    snapshotView.removeFromSuperview()
+                })
+            })
+        }
+
         checkForCanReset()
     }
 

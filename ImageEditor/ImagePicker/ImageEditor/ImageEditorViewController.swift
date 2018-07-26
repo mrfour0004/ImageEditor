@@ -16,6 +16,18 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
     // MARK: - IBOutlets
 
+    @IBOutlet private weak var controlPanelContainerView: UIView! {
+        didSet {
+            controlPanel.delegate = self
+            controlPanel.frame = controlPanelContainerView.bounds
+            controlPanel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            controlPanelContainerView.addSubview(controlPanel)
+        }
+    }
+
+    // MARK: - Views
+
+    private lazy var controlPanel: ImageEditorControlPanel = ImageEditorControlPanel.instantiateFromNib()
     private lazy var cropView = CropView(image: image)
 
     // MARK: - View Lifecycle
@@ -28,7 +40,7 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
         updateCropViewFrame()
 
         view.clipsToBounds = true
-        view.addSubview(cropView)
+        view.insertSubview(cropView, at: 0)
         view.backgroundColor = cropView.backgroundColor
     }
 
@@ -80,11 +92,32 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
         if #available(iOS 11.0, *) {
             cropRegionInset.top += view.safeAreaInsets.top
-            cropRegionInset.bottom += view.safeAreaInsets.bottom
+            cropRegionInset.bottom += view.safeAreaInsets.bottom + controlPanelContainerView.frame.height
         } else {
             cropRegionInset.top += topLayoutGuide.length
-            cropRegionInset.bottom += bottomLayoutGuide.length
+            cropRegionInset.bottom += bottomLayoutGuide.length + controlPanelContainerView.frame.height
         }
         cropView.cropRegionInset = cropRegionInset
     }
+}
+
+// MARK: - ImageEditorControlPanelDelegate Methods
+
+extension ImageEditorViewController: ImageEditorControlPanelDelegate {
+    func imageEditorDidTapRotateButton(_ controlPanel: ImageEditorControlPanel) {
+        cropView.rotateCropView(animated: true)
+    }
+
+    func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueDidChangeTo value: CGFloat) {
+
+    }
+
+    func imageEditor(_ controlPanel: ImageEditorControlPanel, willBedingEditing mode: ImageEditorControlPanel.EditMode) {
+
+    }
+
+    func imageEditor(_ controlPanel: ImageEditorControlPanel, didEndEditing mode: ImageEditorControlPanel.EditMode) {
+
+    }
+
 }

@@ -132,6 +132,7 @@
                         <outlet property="flashButton" destination="FEf-f9-J9Y" id="vhe-2Z-pma"/>
                         <outlet property="libraryButton" destination="eX6-0R-eVV" id="Na6-4N-V1T"/>
                         <outlet property="previewView" destination="bCk-Bu-exr" id="sn4-pY-HEh"/>
+                        <outlet property="shutterButton" destination="8PT-gR-p7y" id="af8-N6-WPb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KwY-1P-yA6" userLabel="First Responder" sceneMemberID="firstResponder"/>

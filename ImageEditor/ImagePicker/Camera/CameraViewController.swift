@@ -31,22 +31,27 @@ class CameraViewController: UIViewController, StoryboardLoadable {
     @IBOutlet private weak var previewView: PreviewView!
     @IBOutlet private weak var flashButton: CameraButton!
     @IBOutlet private weak var libraryButton: CameraButton!
+    @IBOutlet private weak var shutterButton: CameraButton!
 
     // MARK: - Capturing photos
 
     private var flashMode: AVCaptureDevice.FlashMode = .off {
-        didSet {
-            updateFlashButton()
-        }
+        didSet { updateFlashButton() }
     }
     private var photoOutput: AVCaptureStillImageOutput!
+    private var isCapturingPhoto = false
+
     private weak var focusView: FocusView?
-    var photoCapturedHandler: ((UIImage) -> Void)?
+    private weak var translucencyView: UIVisualEffectView?
 
     @IBAction private func didClickShutterButton(_ sender: Any) {
+        guard !isCapturingPhoto else { return }
+        isCapturingPhoto = true
+
         capturePhoto { [unowned self] image in
             guard let imagePicker = self.navigationController as? ImagePickerController else { return }
-            
+
+            self.showTranslucencyView(animated: true)
             if imagePicker.allowsEditing {
                 let imageEditorViewController = ImageEditorViewController.instantiateFromStoryboard()
                 imageEditorViewController.image = image
@@ -64,7 +69,7 @@ class CameraViewController: UIViewController, StoryboardLoadable {
     }
 
     @IBAction private func didClickFlashButton(_ button: UIButton) {
-        flashMode.swith()
+        flashMode.switch()
     }
 
     @IBAction private func didTapPreviewView(_ gestureRecognizer: UITapGestureRecognizer) {
@@ -110,19 +115,13 @@ class CameraViewController: UIViewController, StoryboardLoadable {
         //
         let videoPreviewLayerOrientation = previewView.videoPreviewLayer.connection?.videoOrientation
 
-        UIView.transition(with: previewView, duration: 0.1, options: [.curveEaseInOut], animations: {
-            self.previewView.alpha = 0
-        }, completion: { _ in
-            UIView.transition(with: self.previewView, duration: 0.1, options: [.curveEaseInOut], animations: {
-                self.previewView.alpha = 1
-            }, completion: nil)
-        })
-
         sessionQueue.async {
             let connect = self.photoOutput.connection(with: .video)!
             connect.videoOrientation = videoPreviewLayerOrientation!
 
             CameraViewController.setFlashMode(self.flashMode, for: self.videoDeviceInput.device)
+            //self.photoOutput.prepareToCaptureStillImageBracket(from: connect, withSettingsArray: <#T##[AVCaptureBracketedStillImageSettings]#>, completionHandler: <#T##(Bool, Error?) -> Void#>)
+
             self.photoOutput.captureStillImageAsynchronously(from: connect, completionHandler: { imageDataSampleBuffer, error in
                 guard let imageDataSampleBuffer = imageDataSampleBuffer else {
                     return print("cannot snap still image with error: \(error!)")
@@ -180,7 +179,7 @@ class CameraViewController: UIViewController, StoryboardLoadable {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        //showTranslucencyView(animated: false)
         sessionQueue.async {
             switch self.setupResult {
             case .success:
@@ -191,6 +190,11 @@ class CameraViewController: UIViewController, StoryboardLoadable {
                 break
             }
         }
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -205,6 +209,13 @@ class CameraViewController: UIViewController, StoryboardLoadable {
         super.viewWillDisappear(animated)
     }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        // to re-enable shutter button.
+        isCapturingPhoto = false
+    }
+
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
@@ -217,6 +228,45 @@ class CameraViewController: UIViewController, StoryboardLoadable {
 
             videoPreviewLayerConnection.videoOrientation = newVideoOrientation
         }
+    }
+
+    // MARK: - Translucency View
+
+    func showTranslucencyView(animated: Bool) {
+        guard self.translucencyView == nil else { return }
+        let translucencyView = UIVisualEffectView()
+        translucencyView.frame = view.bounds
+        translucencyView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        view.addSubview(translucencyView)
+
+        self.translucencyView = translucencyView
+
+        guard animated else {
+            translucencyView.effect = UIBlurEffect(style: .light)
+            return
+        }
+
+        UIView.animateKeyframes(withDuration: 0.3, delay: 0, options: [.beginFromCurrentState], animations: {
+            translucencyView.effect = UIBlurEffect(style: .light)
+        }, completion: nil)
+    }
+
+    func hideTranslucencyView(animated: Bool) {
+        guard let translucencyView = translucencyView else { return }
+        self.translucencyView = nil
+
+        let animations: () -> Void = {
+            translucencyView.effect = nil
+        }
+
+        guard animated else {
+            translucencyView.removeFromSuperview()
+            return animations()
+        }
+
+        UIView.animateKeyframes(withDuration: 0.3, delay: 0, options: [.beginFromCurrentState], animations: animations, completion: { _ in
+            translucencyView.removeFromSuperview()
+        })
     }
 }
 
@@ -322,6 +372,7 @@ private extension CameraViewController {
             photoOutput.outputSettings = [AVVideoCodecKey: AVVideoCodecJPEG]
             self.session.addOutput(photoOutput)
             self.photoOutput = photoOutput
+
         } else {
             print("Could not add still image output to the sessvion")
             self.setupResult = .configurationFailed
@@ -331,15 +382,31 @@ private extension CameraViewController {
     }
 
     func addObservers() {
-        let keyValueObservation = session.observe(\.isRunning, options: .new) { _, change in
+        let isSessionRunningObservation = session.observe(\.isRunning, options: .new) { _, change in
             guard let isSessionRunning = change.newValue else { return }
             // disable/enable buttons according session status.
-//            DispatchQueue.main.async {
-//
-//            }
+            DispatchQueue.main.async {
+                if isSessionRunning {
+                    self.hideTranslucencyView(animated: true)
+                } else {
+                    self.showTranslucencyView(animated: true)
+                }
+            }
         }
+        keyValueObservations.append(isSessionRunningObservation)
 
-        keyValueObservations.append(keyValueObservation)
+        let isCapturingStillImageObservation = photoOutput.observe(\.isCapturingStillImage, options: .new, changeHandler: { _, change in
+            guard let isCapturingStillImage = change.newValue, isCapturingStillImage else { return }
+            UIView.transition(with: self.previewView, duration: 0.1, options: [.curveEaseInOut], animations: {
+                self.previewView.alpha = 0
+            }, completion: { _ in
+                UIView.transition(with: self.previewView, duration: 0.1, options: [.curveEaseInOut], animations: {
+                    self.previewView.alpha = 1
+                }, completion: nil)
+            })
+        })
+        keyValueObservations.append(isCapturingStillImageObservation)
+
         NotificationCenter.default.addObserver(self, selector: #selector(subjectAreaDidChange), name: .AVCaptureDeviceSubjectAreaDidChange, object: videoDeviceInput.device)
     }
 
@@ -360,7 +427,8 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
-
+        //imagePicker.modalPresentationStyle = .overFullScreen
+        showTranslucencyView(animated: true)
         self.present(imagePicker, animated: true, completion: nil)
     }
 
