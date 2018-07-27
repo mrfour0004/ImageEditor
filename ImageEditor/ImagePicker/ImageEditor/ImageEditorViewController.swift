@@ -13,6 +13,9 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
     // MARK: - Properties
 
     var image: UIImage!
+    private var imagePicker: ImagePickerController {
+        return navigationController as! ImagePickerController
+    }
 
     // MARK: - IBOutlets
 
@@ -36,12 +39,10 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
         super.viewDidLoad()
 
         automaticallyAdjustsScrollViewInsets = false
-
         updateCropViewFrame()
 
-        view.clipsToBounds = true
-        view.insertSubview(cropView, at: 0)
-        view.backgroundColor = cropView.backgroundColor
+        setupNavigationItem()
+        setupView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -84,6 +85,25 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
         updateCropViewFrame()
     }
 
+    // MARK: - Buttons
+
+    @objc private func didTapDoneButton(_ sender: Any) {
+        cropImage()
+    }
+
+    // MARK: - Setup Views
+
+    private func setupNavigationItem() {
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(didTapDoneButton))
+        navigationItem.rightBarButtonItem = doneButton
+    }
+
+    private func setupView() {
+        view.clipsToBounds = true
+        view.insertSubview(cropView, at: 0)
+        view.backgroundColor = cropView.backgroundColor
+    }
+
     // MARK: - Convenience Methods
 
     private func updateCropViewFrame() {
@@ -99,6 +119,14 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
         }
         cropView.cropRegionInset = cropRegionInset
     }
+
+    private func cropImage() {
+        let cropFrame = cropView.imageCropFrame
+        let angle = cropView.angle
+        let croppedImage = image.cropped(with: cropFrame, angle: angle)
+        imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: croppedImage)
+    }
+
 }
 
 // MARK: - ImageEditorControlPanelDelegate Methods

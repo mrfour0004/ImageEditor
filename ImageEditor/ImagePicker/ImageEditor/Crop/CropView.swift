@@ -45,8 +45,8 @@ class CropView: UIView {
             var frame: CGRect = .zero
             frame.origin.x = max(0, floor((contentOffset.x + edgeInsets.left) * (imageSize.width / contentSize.width)))
             frame.origin.y = max(0, floor((contentOffset.y + edgeInsets.top) * (imageSize.height / contentSize.height)))
-            frame.size.width = min(frame.width, ceil(cropBoxFrame.width * (imageSize.width / contentSize.width)))
-            frame.size.height = min(frame.height, ceil(cropBoxFrame.height * (imageSize.height / contentSize.height)))
+            frame.size.width = min(imageSize.width, ceil(cropBoxFrame.width * (imageSize.width / contentSize.width)))
+            frame.size.height = min(imageSize.height, ceil(cropBoxFrame.height * (imageSize.height / contentSize.height)))
 
             return frame
         }
@@ -65,7 +65,7 @@ class CropView: UIView {
     private let image: UIImage
 
     /// The rotation angle of the crop view (Will always be negative as it rotates in a counter-clockwise direction)
-    private var angle: Int = 0
+    var angle: Int = 0
     private var isEditing: Bool = false
     private var cropBoxResizeEnabled = false
     private var aspectRatio: CGSize = .zero
