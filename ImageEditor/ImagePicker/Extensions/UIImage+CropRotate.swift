@@ -23,13 +23,12 @@ extension UIImage {
             let imageView = UIImageView(image: self)
             imageView.layer.minificationFilter = kCAFilterNearest
             imageView.layer.magnificationFilter = kCAFilterNearest
-            imageView.transform = CGAffineTransform.identity.rotated(by: CGFloat(angle) * (.pi/180))
+            imageView.transform = CGAffineTransform.identity.rotated(by: CGFloat(angle) * (CGFloat.pi/CGFloat(180.0)))
 
             let rotatedRect = imageView.bounds.applying(imageView.transform)
             let containerView = UIView(frame: CGRect(origin: .zero, size: rotatedRect.size))
             containerView.addSubview(imageView)
             imageView.center = containerView.center
-
             context.translateBy(x: -frame.origin.x, y: -frame.origin.y)
             containerView.layer.render(in: context)
         } else {
@@ -42,6 +41,7 @@ extension UIImage {
             return self
         }
 
+        UIGraphicsEndImageContext();
         return UIImage(cgImage: croppedImage.cgImage!, scale: UIScreen.main.scale, orientation: .up)
     }
 }

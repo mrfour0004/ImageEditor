@@ -36,7 +36,7 @@ class CropView: UIView {
     /// In relation to the coordinate space of the image, the frame that the crop view is focusing on
     var imageCropFrame: CGRect {
         get {
-            let imageSize = image.size
+            let imageSize = self.imageSize
             let contentSize = scrollView.contentSize
             let cropBoxFrame = self.cropBoxFrame
             let contentOffset = scrollView.contentOffset
@@ -996,7 +996,12 @@ private extension CropView {
     }
 
     var imageSize: CGSize {
-        return .zero
+        switch angle {
+        case 90, -90, 270, -270:
+            return CGSize(width: image.size.height, height: image.size.width)
+        default:
+            return image.size
+        }
     }
 
     var hasAspectRatio: Bool {
