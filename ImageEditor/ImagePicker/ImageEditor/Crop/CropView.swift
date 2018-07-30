@@ -68,7 +68,13 @@ class CropView: UIView {
     var angle: Int = 0
     private var isEditing: Bool = false
     private var cropBoxResizeEnabled = false
-    private var aspectRatio: CGSize = .zero
+
+    /// A width x height ratio that the crop box will be rescaled to (eg 4:3 is {4.0f, 3.0f})
+    /// Setting it to CGSizeZero will reset the aspect ratio to the image's own ratio.
+    var aspectRatio: CGSize = .zero
+
+    /// When the cropping box is locked to its current aspect ratio (But can still be resized)
+    var isAspectRatioLockEnabled: Bool = false
 
     private var dynamicBlurEffect = true
 
@@ -222,6 +228,11 @@ class CropView: UIView {
 
     func setGridOverlayHidden(_ isHidden: Bool, animated: Bool) {
 
+    }
+
+    var cropBoxAspectRatioIsPortrait: Bool {
+        let cropFrame = self.cropBoxFrame
+        return cropFrame.width < cropFrame.height
     }
 
     // MARK: - Timer
@@ -397,7 +408,7 @@ private extension CropView {
         var frame: CGRect = .zero
         frame.size = hasAspectRatio ? cropBoxSize : scaledSize
         frame.origin.x = bounds.origin.x + floor((bounds.width - frame.width) * CGFloat(0.5))
-        frame.origin.y = bounds.origin.y + floor((bounds.height - frame.height) * CGFloat(0.5));
+        frame.origin.y = bounds.origin.y + floor((bounds.height - frame.height) * CGFloat(0.5))
         cropBoxFrame = frame
 
         scrollView.zoomScale = scrollView.minimumZoomScale
@@ -519,46 +530,157 @@ extension CropView {
         point.x = max(contentFrame.origin.x, point.x)
         point.y = max(contentFrame.origin.y, point.y)
 
-        let xDelta = ceil(point.x - panOriginPoint.x)
-        let yDelta = ceil(point.y - panOriginPoint.y)
+        var xDelta = ceil(point.x - panOriginPoint.x)
+        var yDelta = ceil(point.y - panOriginPoint.y)
+
+        let aspectRatio = originFrame.width / originFrame.height
+        var isAspectHorizontal: Bool = false
+        var isAspectVertical: Bool = false
 
         var clampMinFromTop = false
         var clampMinFromLeft = false
 
         switch tappedEdge {
         case .left:
+            if isAspectRatioLockEnabled {
+                isAspectHorizontal = true
+                xDelta = max(xDelta, 0)
+                let scaleOrigin = CGPoint(x: originFrame.maxX, y: originFrame.midY)
+                frame.size.height = frame.size.width / aspectRatio
+                frame.origin.y = scaleOrigin.y - frame.height*CGFloat(0.5)
+            }
+
             frame.origin.x = originFrame.origin.x + xDelta
             frame.size.width = originFrame.width - xDelta
+
             clampMinFromLeft = true
+        case .right where isAspectRatioLockEnabled:
+            isAspectHorizontal = true
+            let scaleOrigin = CGPoint(x: originFrame.minX, y: originFrame.midY)
+            frame.size.height = frame.size.width / aspectRatio
+            frame.origin.y = scaleOrigin.y - frame.height*CGFloat(0.5)
+            frame.size.width = originFrame.width + xDelta
+            frame.size.width = min(frame.width, contentFrame.height * aspectRatio)
         case .right:
             frame.size.width = originFrame.width + xDelta
+        case .bottom where isAspectRatioLockEnabled:
+            isAspectVertical = true
+            let scaleOrigin = CGPoint(x: originFrame.midX, y: originFrame.minY)
+            frame.size.width = frame.height * aspectRatio
+            frame.origin.x = scaleOrigin.x - frame.width*CGFloat(0.5)
+            frame.size.height = originFrame.height + yDelta
+            frame.size.height = min(frame.height, contentFrame.width / aspectRatio)
         case .bottom:
             frame.size.height = originFrame.height + yDelta
+        case .top where isAspectRatioLockEnabled:
+            isAspectVertical = true
+            yDelta = max(0, yDelta)
+
+            let scaleOrigin = CGPoint(x: originFrame.midX, y: originFrame.maxY)
+            frame.size.width = frame.size.height * aspectRatio
+            frame.origin.x = scaleOrigin.x - frame.width*0.5
+            frame.origin.y    = originFrame.origin.y + yDelta
+            frame.size.height = originFrame.height - yDelta
+            clampMinFromTop = true
         case .top:
             frame.origin.y = originFrame.origin.y + yDelta
             frame.size.height = originFrame.height - yDelta
+            clampMinFromTop = true
+        case .topLeft where isAspectRatioLockEnabled:
+            xDelta = max(xDelta, 0)
+            yDelta = max(yDelta, 0)
+
+            var distance: CGPoint = .zero
+            distance.x = CGFloat(1.0) - (xDelta / originFrame.width)
+            distance.y = CGFloat(1.0) - (yDelta / originFrame.height)
+
+            let scale: CGFloat = (distance.x + distance.y) * CGFloat(0.5)
+
+            frame.size.width = ceil(originFrame.width * scale)
+            frame.size.height = ceil(originFrame.height * scale)
+            frame.origin.x = originFrame.origin.x + (originFrame.width - frame.width)
+            frame.origin.y = originFrame.origin.y + (originFrame.height - frame.size.height)
+
+            isAspectVertical = true
+            isAspectHorizontal = true
+
+            clampMinFromLeft = true
             clampMinFromTop = true
         case .topLeft:
             frame.origin.x = originFrame.origin.x + xDelta
             frame.size.width = originFrame.width - xDelta
             clampMinFromLeft = true
             clampMinFromTop = true
+        case .topRight where isAspectRatioLockEnabled:
+            xDelta = min(xDelta, 0)
+            yDelta = max(yDelta, 0)
+
+            var distance: CGPoint = .zero
+            distance.x = CGFloat(1.0) - (-xDelta / originFrame.width)
+            distance.y = CGFloat(1.0) - (yDelta / originFrame.height)
+
+            let scale = (distance.x + distance.y) * CGFloat(0.5)
+
+            frame.size.width = ceil(originFrame.width * scale)
+            frame.size.height = ceil(originFrame.height * scale)
+            frame.origin.y = originFrame.origin.y + (originFrame.height - frame.size.height)
+
+            isAspectVertical = true
+            isAspectHorizontal = true
+            clampMinFromTop = true
         case .topRight:
             frame.size.width = originFrame.width + xDelta
             frame.origin.y = originFrame.origin.y + yDelta
             frame.size.height = originFrame.height - yDelta
+            clampMinFromTop = true
+        case .bottomLeft where isAspectRatioLockEnabled:
+            var distance: CGPoint = .zero
+            distance.x = 1.0 - (xDelta / originFrame.width)
+            distance.y = 1.0 - (-yDelta / originFrame.height)
+
+            let scale: CGFloat = (distance.x + distance.y) * CGFloat(0.5)
+
+            frame.size.width = ceil(originFrame.width * scale)
+            frame.size.height = ceil(originFrame.height * scale)
+            frame.origin.x = originFrame.maxX - frame.width
+
+            isAspectVertical = true
+            isAspectHorizontal = true
+            clampMinFromLeft = true
         case .bottomLeft:
             frame.size.height = originFrame.height + yDelta
             frame.origin.x = originFrame.origin.x + xDelta
             frame.size.width = originFrame.width - xDelta
+            clampMinFromLeft = true
+        case .bottomRight where isAspectRatioLockEnabled:
+            var distance: CGPoint = .zero
+            distance.x = CGFloat(1.0) - (-xDelta)/originFrame.width
+            distance.y = CGFloat(1.0) - (-yDelta)/originFrame.height
+
+            let scale = (distance.x + distance.y) * CGFloat(0.5)
+            frame.size.width = ceil(originFrame.width * scale)
+            frame.size.height = ceil(originFrame.height * scale)
+
+            isAspectVertical = true
+            isAspectHorizontal = true
         case .bottomRight:
             frame.size.height = originFrame.height + yDelta
             frame.size.width = originFrame.width + xDelta
         case .none: break
         }
 
-        let minSize = Const.cropViewMinimumBoxSize
-        let maxSize = contentFrame.size
+        var minSize = Const.cropViewMinimumBoxSize
+        var maxSize = contentFrame.size
+
+        if isAspectRatioLockEnabled && isAspectHorizontal {
+            maxSize.height = contentFrame.width / aspectRatio
+            minSize.width = Const.cropViewMinimumBoxSize.width / aspectRatio
+        }
+
+        if isAspectRatioLockEnabled && isAspectVertical {
+            maxSize.width = contentFrame.height / aspectRatio
+            minSize.height = Const.cropViewMinimumBoxSize.height / aspectRatio
+        }
 
         frame.size.width = max(frame.width, minSize.width)
         frame.size.height = max(frame.height, minSize.height)
@@ -651,7 +773,7 @@ extension CropView {
         // assign the new crop box frame and re-adjust the content to fill it
         self.cropBoxFrame = newCropFrame
         moveCroppedContentToCenter(animated: false)
-        newCropFrame = self.cropBoxFrame;
+        newCropFrame = self.cropBoxFrame
 
         // work out how to line up out point of interest into the middle of the crop box
         cropTargetPoint.x *= scale
@@ -711,6 +833,87 @@ extension CropView {
         }
 
         checkForCanReset()
+    }
+
+    func setAspectRatio(_ aspectRatio: CGSize, animated: Bool) {
+        var aspectRatio = aspectRatio
+
+        self.aspectRatio = aspectRatio
+
+        // Will be executed automatically when added to a super view
+        guard superview != nil else { return }
+
+        // Passing in an empty size will revert back to the image aspect ratio
+        if (aspectRatio.width < CGFloat.ulpOfOne) && (aspectRatio.height < CGFloat.ulpOfOne) {
+            aspectRatio = imageSize
+        }
+
+        let boundsFrame = contentBounds
+        var cropBoxFrame = self.cropBoxFrame
+        var offset = scrollView.contentOffset
+
+        var cropBoxIsProtrait = false
+        if (Int(aspectRatio.width) == 1) && (Int(aspectRatio.height) == 1) {
+            cropBoxIsProtrait = imageSize.width > imageSize.height
+        } else {
+            cropBoxIsProtrait = aspectRatio.width < aspectRatio.height
+        }
+
+        var zoomOut = false
+        if cropBoxIsProtrait {
+            let newWidth: CGFloat = floor(cropBoxFrame.height * (aspectRatio.width/aspectRatio.height))
+            let delta: CGFloat = cropBoxFrame.width - newWidth
+            cropBoxFrame.size.width = newWidth
+            offset.x += delta * 0.5
+
+            if delta < CGFloat.ulpOfOne {
+                // set to 0 to avoid accidental clamping by the crop frame sanitizer
+                cropBoxFrame.origin.x = self.contentBounds.origin.x
+            }
+
+            let boundsWidth = boundsFrame.width
+            if newWidth > boundsWidth {
+                let scale = boundsWidth / newWidth
+                cropBoxFrame.size.height *= scale
+                cropBoxFrame.size.width = boundsWidth
+                zoomOut = true
+            }
+        } else {
+            let newHeight: CGFloat = floor(cropBoxFrame.width * (aspectRatio.height/aspectRatio.width))
+            let delta = cropBoxFrame.height - newHeight
+            cropBoxFrame.size.height = newHeight
+            offset.y += delta * 0.5
+
+            if delta < CGFloat.ulpOfOne {
+                cropBoxFrame.origin.x = self.contentBounds.origin.y
+            }
+
+            let boundsHeight = boundsFrame.height
+            if newHeight > boundsHeight {
+                let scale: CGFloat = boundsHeight / newHeight
+                cropBoxFrame.size.width *= scale
+                cropBoxFrame.size.height = boundsHeight
+                zoomOut = true
+            }
+        }
+
+        self.cropBoxLastEditedSize = cropBoxFrame.size
+        self.cropBoxLastEditedAngle = angle
+
+        let animations: () -> Void = {
+            self.scrollView.contentOffset = offset
+            self.cropBoxFrame = cropBoxFrame
+
+            if zoomOut {
+                self.scrollView.zoomScale = self.scrollView.minimumZoomScale
+            }
+
+            self.moveCroppedContentToCenter(animated: false)
+            self.checkForCanReset()
+        }
+
+        guard animated else { return animations() }
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.7, options: .beginFromCurrentState, animations: animations, completion: nil)
     }
 
     func moveCroppedContentToCenter(animated: Bool) {

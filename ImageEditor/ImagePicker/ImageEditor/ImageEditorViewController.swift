@@ -13,6 +13,15 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
     // MARK: - Properties
 
     var image: UIImage!
+    var isAspectRatioLockEnabled: Bool {
+        get { return cropView.isAspectRatioLockEnabled }
+        set { cropView.isAspectRatioLockEnabled = newValue }
+    }
+
+    var aspectRatioPreset: CropAspectRatioPreset {
+        get { return imagePicker.cropAspectRatioPreset }
+    }
+    
     private var imagePicker: ImagePickerController {
         return navigationController as! ImagePickerController
     }
@@ -39,6 +48,8 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
         super.viewDidLoad()
 
         automaticallyAdjustsScrollViewInsets = false
+        isAspectRatioLockEnabled = imagePicker.isAspectRatioLockEnabled
+        
         updateCropViewFrame()
 
         setupNavigationItem()
@@ -50,6 +61,10 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
         if navigationController == nil {
             cropView.setBackgroundImageViewHidden(true, animated: false)
+        }
+
+        if aspectRatioPreset != .original {
+            setAspectRatioPreset(aspectRatioPreset, animated: false)
         }
     }
 
@@ -125,6 +140,16 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
         let angle = cropView.angle
         let croppedImage = image.cropped(with: cropFrame, angle: angle)
         imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: croppedImage)
+    }
+
+    private func setAspectRatioPreset(_ aspectRatioPreset: CropAspectRatioPreset, animated: Bool) {
+        var aspectRatio = aspectRatioPreset.aspectRatio
+
+        if (!aspectRatioPreset.isCustom && cropView.cropBoxAspectRatioIsPortrait && !cropView.isAspectRatioLockEnabled) {
+            aspectRatio = CGSize(width: aspectRatio.height, height: aspectRatio.width)
+        }
+
+        cropView.setAspectRatio(aspectRatio, animated: animated)
     }
 
 }

@@ -19,6 +19,8 @@ class ImagePickerController: UINavigationController {
 
     /// A Boolean value indicating whether the user is allowed to edit a selected still image. This property is set to `false` by default.
     var allowsEditing = false
+    var cropAspectRatioPreset: CropAspectRatioPreset = .original
+    var isAspectRatioLockEnabled: Bool = false
 
     weak var pickerDelegate: ImagePickerControllerDelegate?
 

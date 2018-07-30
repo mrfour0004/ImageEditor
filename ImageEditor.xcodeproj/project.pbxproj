@@ -10,6 +10,7 @@
 		5E10B8D020FF832400E8838C /* CropScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E10B8CF20FF832400E8838C /* CropScrollView.swift */; };
 		5E10B8D220FF840500E8838C /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E10B8D120FF840500E8838C /* CropView.swift */; };
 		5E10B8D421000E3D00E8838C /* CropOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E10B8D321000E3D00E8838C /* CropOverlayView.swift */; };
+		5E1A23F7210B514700A52346 /* CropAspectRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A23F6210B514700A52346 /* CropAspectRatio.swift */; };
 		5E35539920E75B140089F433 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E35539820E75B140089F433 /* AppDelegate.swift */; };
 		5E35539B20E75B140089F433 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E35539A20E75B140089F433 /* ViewController.swift */; };
 		5E35539E20E75B140089F433 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5E35539C20E75B140089F433 /* Main.storyboard */; };
@@ -47,6 +48,7 @@
 		5E10B8CF20FF832400E8838C /* CropScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropScrollView.swift; sourceTree = "<group>"; };
 		5E10B8D120FF840500E8838C /* CropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
 		5E10B8D321000E3D00E8838C /* CropOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropOverlayView.swift; sourceTree = "<group>"; };
+		5E1A23F6210B514700A52346 /* CropAspectRatio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropAspectRatio.swift; sourceTree = "<group>"; };
 		5E35539520E75B140089F433 /* ImageEditor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageEditor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E35539820E75B140089F433 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5E35539A20E75B140089F433 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 				5E10B8D321000E3D00E8838C /* CropOverlayView.swift */,
 				5E10B8CF20FF832400E8838C /* CropScrollView.swift */,
 				5E10B8D120FF840500E8838C /* CropView.swift */,
+				5E1A23F6210B514700A52346 /* CropAspectRatio.swift */,
 			);
 			path = Crop;
 			sourceTree = "<group>";
@@ -368,6 +371,7 @@
 				5E8BC5FD20FF5C6E00C0AFD4 /* NavigationInterruptible.swift in Sources */,
 				5E10B8D421000E3D00E8838C /* CropOverlayView.swift in Sources */,
 				5E4477112108BB2500889636 /* NibLoadable.swift in Sources */,
+				5E1A23F7210B514700A52346 /* CropAspectRatio.swift in Sources */,
 				5EC3F00320F9C391001D811D /* Images.swift in Sources */,
 				5E35539920E75B140089F433 /* AppDelegate.swift in Sources */,
 				5E10B8D220FF840500E8838C /* CropView.swift in Sources */,

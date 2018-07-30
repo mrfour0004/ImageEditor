@@ -26,6 +26,8 @@ class ViewController: UIViewController {
         let picker = ImagePickerController()
         picker.pickerDelegate = self
         picker.allowsEditing = true
+        picker.cropAspectRatioPreset = .square
+        picker.isAspectRatioLockEnabled = true
 
         present(picker, animated: true, completion: nil)
     }
