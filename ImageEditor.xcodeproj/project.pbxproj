@@ -35,6 +35,9 @@
 		5E8BC5F820FF596100C0AFD4 /* StoryboardLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BC5F720FF596100C0AFD4 /* StoryboardLoadable.swift */; };
 		5E8BC5FB20FF5C3D00C0AFD4 /* NavigationBarStyleable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BC5FA20FF5C3D00C0AFD4 /* NavigationBarStyleable.swift */; };
 		5E8BC5FD20FF5C6E00C0AFD4 /* NavigationInterruptible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BC5FC20FF5C6E00C0AFD4 /* NavigationInterruptible.swift */; };
+		5E8CB0DD210F02BA009B5C02 /* ImageEditorSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8CB0DC210F02BA009B5C02 /* ImageEditorSliderView.swift */; };
+		5E8CB0DF210F02C2009B5C02 /* ImageEditorSliderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E8CB0DE210F02C2009B5C02 /* ImageEditorSliderView.xib */; };
+		5EA2F792210FFDA300325CC5 /* UISlider+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA2F791210FFDA300325CC5 /* UISlider+Extension.swift */; };
 		5EC3F00320F9C391001D811D /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC3F00220F9C391001D811D /* Images.swift */; };
 		5EDE5E6820F9C99D00614CE9 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */; };
 		5EDE5E6A20F9CF9800614CE9 /* FlashMode+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */; };
@@ -75,6 +78,9 @@
 		5E8BC5F720FF596100C0AFD4 /* StoryboardLoadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryboardLoadable.swift; sourceTree = "<group>"; };
 		5E8BC5FA20FF5C3D00C0AFD4 /* NavigationBarStyleable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarStyleable.swift; sourceTree = "<group>"; };
 		5E8BC5FC20FF5C6E00C0AFD4 /* NavigationInterruptible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationInterruptible.swift; sourceTree = "<group>"; };
+		5E8CB0DC210F02BA009B5C02 /* ImageEditorSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditorSliderView.swift; sourceTree = "<group>"; };
+		5E8CB0DE210F02C2009B5C02 /* ImageEditorSliderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageEditorSliderView.xib; sourceTree = "<group>"; };
+		5EA2F791210FFDA300325CC5 /* UISlider+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UISlider+Extension.swift"; sourceTree = "<group>"; };
 		5EC3F00220F9C391001D811D /* Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
 		5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlashMode+UIImage.swift"; sourceTree = "<group>"; };
@@ -162,9 +168,11 @@
 		5E4476CD2107769F00889636 /* ControlPanel */ = {
 			isa = PBXGroup;
 			children = (
+				5E4476D6210781C100889636 /* ImageEditorControlButton.swift */,
 				5E4476D0210776FA00889636 /* ImageEditorControlPanel.swift */,
 				5E4476D22107773400889636 /* ImageEditorControlPanel.xib */,
-				5E4476D6210781C100889636 /* ImageEditorControlButton.swift */,
+				5E8CB0DC210F02BA009B5C02 /* ImageEditorSliderView.swift */,
+				5E8CB0DE210F02C2009B5C02 /* ImageEditorSliderView.xib */,
 			);
 			path = ControlPanel;
 			sourceTree = "<group>";
@@ -228,9 +236,10 @@
 		5EDE5E6620F9C98B00614CE9 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */,
 				5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */,
 				5E8BC5ED20FDEEBD00C0AFD4 /* UIImage+CropRotate.swift */,
+				5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */,
+				5EA2F791210FFDA300325CC5 /* UISlider+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -304,6 +313,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E8CB0DF210F02C2009B5C02 /* ImageEditorSliderView.xib in Resources */,
 				5E3553A320E75B150089F433 /* LaunchScreen.storyboard in Resources */,
 				5E3553A020E75B150089F433 /* Assets.xcassets in Resources */,
 				5E5894D320F070A000193CEB /* CameraViewController.storyboard in Resources */,
@@ -368,11 +378,13 @@
 				5E5894CF20EFAF1D00193CEB /* PreviewView.swift in Sources */,
 				5E5894D520F0866700193CEB /* PhotoCaptureProcessor.swift in Sources */,
 				5E8BC5E420FDAB4F00C0AFD4 /* ImagePickerController.swift in Sources */,
+				5EA2F792210FFDA300325CC5 /* UISlider+Extension.swift in Sources */,
 				5E8BC5FD20FF5C6E00C0AFD4 /* NavigationInterruptible.swift in Sources */,
 				5E10B8D421000E3D00E8838C /* CropOverlayView.swift in Sources */,
 				5E4477112108BB2500889636 /* NibLoadable.swift in Sources */,
 				5E1A23F7210B514700A52346 /* CropAspectRatio.swift in Sources */,
 				5EC3F00320F9C391001D811D /* Images.swift in Sources */,
+				5E8CB0DD210F02BA009B5C02 /* ImageEditorSliderView.swift in Sources */,
 				5E35539920E75B140089F433 /* AppDelegate.swift in Sources */,
 				5E10B8D220FF840500E8838C /* CropView.swift in Sources */,
 				5E10B8D020FF832400E8838C /* CropScrollView.swift in Sources */,

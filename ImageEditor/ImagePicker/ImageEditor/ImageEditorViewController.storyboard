@@ -18,19 +18,27 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="H8F-ha-Hl8" userLabel="Bottom Unsafe Area View">
+                                <rect key="frame" x="0.0" y="667" width="375" height="0.0"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qFl-YV-HAt">
-                                <rect key="frame" x="0.0" y="567" width="375" height="100"/>
+                                <rect key="frame" x="0.0" y="547" width="375" height="120"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="100" id="TpX-rm-OuU"/>
+                                    <constraint firstAttribute="height" constant="120" id="TpX-rm-OuU"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="qFl-YV-HAt" firstAttribute="leading" secondItem="ItN-E5-mEq" secondAttribute="leading" id="5pR-tC-976"/>
+                            <constraint firstAttribute="bottom" secondItem="H8F-ha-Hl8" secondAttribute="bottom" id="7EE-FU-m9r"/>
+                            <constraint firstItem="H8F-ha-Hl8" firstAttribute="leading" secondItem="ItN-E5-mEq" secondAttribute="leading" id="PAw-tG-stu"/>
                             <constraint firstItem="qFl-YV-HAt" firstAttribute="bottom" secondItem="ItN-E5-mEq" secondAttribute="bottom" id="YRx-ms-KTB"/>
                             <constraint firstItem="ItN-E5-mEq" firstAttribute="trailing" secondItem="qFl-YV-HAt" secondAttribute="trailing" id="d7L-Dw-AeB"/>
+                            <constraint firstItem="H8F-ha-Hl8" firstAttribute="top" secondItem="ItN-E5-mEq" secondAttribute="bottom" id="eGp-9g-GsB"/>
+                            <constraint firstItem="ItN-E5-mEq" firstAttribute="trailing" secondItem="H8F-ha-Hl8" secondAttribute="trailing" id="tuo-dl-LUW"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="ItN-E5-mEq"/>
                     </view>

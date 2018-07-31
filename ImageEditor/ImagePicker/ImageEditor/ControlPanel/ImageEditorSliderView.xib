@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="ImageEditorSliderView" customModule="ImageEditor" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="111"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="L6f-Ho-fka">
+                    <rect key="frame" x="0.0" y="16" width="375" height="95"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rCU-RK-OkG">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="51"/>
+                            <subviews>
+                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="8VI-Ed-RQM" customClass="Slider" customModule="ImageEditor" customModuleProvider="target">
+                                    <rect key="frame" x="22" y="0.0" width="331" height="52"/>
+                                </slider>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="8VI-Ed-RQM" secondAttribute="bottom" id="F13-XZ-4id"/>
+                                <constraint firstAttribute="trailing" secondItem="8VI-Ed-RQM" secondAttribute="trailing" constant="24" id="Ice-4C-m41"/>
+                                <constraint firstItem="8VI-Ed-RQM" firstAttribute="leading" secondItem="rCU-RK-OkG" secondAttribute="leading" constant="24" id="JhE-M3-QTH"/>
+                                <constraint firstItem="8VI-Ed-RQM" firstAttribute="top" secondItem="rCU-RK-OkG" secondAttribute="top" id="Ob3-wc-sL8"/>
+                            </constraints>
+                        </view>
+                        <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="WuQ-LV-o7a">
+                            <rect key="frame" x="0.0" y="51" width="375" height="44"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pS6-mG-bVO">
+                                    <rect key="frame" x="0.0" y="0.0" width="187.5" height="44"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="44" id="fKs-JJ-sJr"/>
+                                    </constraints>
+                                    <state key="normal" title="Cancel"/>
+                                    <connections>
+                                        <action selector="didTapCancelButton:" destination="iN0-l3-epB" eventType="touchUpInside" id="Zrg-za-yyo"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pS0-0x-E1j">
+                                    <rect key="frame" x="187.5" y="0.0" width="187.5" height="44"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="44" id="sEH-6p-k2I"/>
+                                    </constraints>
+                                    <state key="normal" title="Done"/>
+                                    <connections>
+                                        <action selector="didTapDoneButton:" destination="iN0-l3-epB" eventType="touchUpInside" id="7pY-r8-hAy"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="rCU-RK-OkG" firstAttribute="width" secondItem="L6f-Ho-fka" secondAttribute="width" id="0IY-hM-C2z"/>
+                    </constraints>
+                </stackView>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="L6f-Ho-fka" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="Grn-YZ-c4E"/>
+                <constraint firstItem="L6f-Ho-fka" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="Q6a-VO-q6i"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="L6f-Ho-fka" secondAttribute="trailing" id="UOM-rR-oSK"/>
+                <constraint firstItem="L6f-Ho-fka" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="ZKV-UX-7Wd"/>
+            </constraints>
+            <nil key="simulatedTopBarMetrics"/>
+            <nil key="simulatedBottomBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="buttonStackView" destination="WuQ-LV-o7a" id="sUL-jF-N3w"/>
+                <outlet property="slider" destination="8VI-Ed-RQM" id="ywb-s8-rdf"/>
+            </connections>
+            <point key="canvasLocation" x="33.5" y="-224.5"/>
+        </view>
+    </objects>
+</document>

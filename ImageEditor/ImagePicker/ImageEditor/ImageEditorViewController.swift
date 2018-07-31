@@ -157,20 +157,27 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 // MARK: - ImageEditorControlPanelDelegate Methods
 
 extension ImageEditorViewController: ImageEditorControlPanelDelegate {
+    
     func imageEditorDidTapRotateButton(_ controlPanel: ImageEditorControlPanel) {
         cropView.rotateCropView(animated: true)
     }
 
-    func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueDidChangeTo value: CGFloat) {
+    func imageEditor(_ controlPanel: ImageEditorControlPanel, didCancelEditing mode: ImageEditorControlPanel.EditMode) {
+        // update nav bar
+        // updateImage(for: mode, value: editedValue)
+    }
 
+    func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueChangedTo value: Int, for editingMode: ImageEditorControlPanel.EditMode) {
+        // update image
+        // updateImage(for: editingMode, value: value)
     }
 
     func imageEditor(_ controlPanel: ImageEditorControlPanel, willBedingEditing mode: ImageEditorControlPanel.EditMode) {
-
+        // update nav bar
     }
 
     func imageEditor(_ controlPanel: ImageEditorControlPanel, didEndEditing mode: ImageEditorControlPanel.EditMode) {
-
+        // update nav bar
     }
 
 }
