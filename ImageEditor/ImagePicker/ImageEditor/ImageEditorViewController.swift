@@ -13,6 +13,15 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
     // MARK: - Properties
 
     var image: UIImage!
+    var isProcessingImage = false
+
+    lazy var ciContext: CIContext = CIContext(options: nil)
+    lazy var ciFilter: CIFilter = {
+        let filter = CIFilter(name: "CIColorControls")!
+        filter.setValue(CIImage(image: image)!, forKey: kCIInputImageKey)
+        return filter
+    }()
+
     var isAspectRatioLockEnabled: Bool {
         get { return cropView.isAspectRatioLockEnabled }
         set { cropView.isAspectRatioLockEnabled = newValue }
@@ -136,10 +145,19 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
     }
 
     private func cropImage() {
+        let croppedImage = self.croppedImage
+
+        ciFilter.setValue(CIImage(image: croppedImage), forKey: kCIInputImageKey)
+        let outputImage = self.ciFilter.outputImage!
+        let filteredImage = self.ciContext.createCGImage(outputImage, from: outputImage.extent)!
+
+        imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: UIImage(cgImage: filteredImage, scale: UIScreen.main.scale, orientation: croppedImage.imageOrientation))
+    }
+
+    private var croppedImage: UIImage {
         let cropFrame = cropView.imageCropFrame
         let angle = cropView.angle
-        let croppedImage = image.cropped(with: cropFrame, angle: angle)
-        imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: croppedImage)
+        return image.cropped(with: cropFrame, angle: angle)
     }
 
     private func setAspectRatioPreset(_ aspectRatioPreset: CropAspectRatioPreset, animated: Bool) {
@@ -151,7 +169,7 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
         cropView.setAspectRatio(aspectRatio, animated: animated)
     }
-
+    
 }
 
 // MARK: - ImageEditorControlPanelDelegate Methods
@@ -167,9 +185,22 @@ extension ImageEditorViewController: ImageEditorControlPanelDelegate {
         // updateImage(for: mode, value: editedValue)
     }
 
-    func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueChangedTo value: Int, for editingMode: ImageEditorControlPanel.EditMode) {
-        // update image
-        // updateImage(for: editingMode, value: value)
+    func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueChangedTo value: Float, for editingMode: ImageEditorControlPanel.EditMode) {
+        guard !isProcessingImage else { return }
+        isProcessingImage = true
+
+
+        DispatchQueue.global().async {
+            print("converted value: \(value)")
+            self.ciFilter.setValue(value, forKey: editingMode.ciInputKey)
+            let outputImage = self.ciFilter.outputImage!
+            let filteredImage = self.ciContext.createCGImage(outputImage, from: outputImage.extent)!
+
+            DispatchQueue.main.async {
+                self.cropView.foregroundImageView.image = UIImage(cgImage: filteredImage, scale: UIScreen.main.scale, orientation: self.image.imageOrientation)
+            }
+            self.isProcessingImage = false
+        }
     }
 
     func imageEditor(_ controlPanel: ImageEditorControlPanel, willBedingEditing mode: ImageEditorControlPanel.EditMode) {
@@ -179,5 +210,4 @@ extension ImageEditorViewController: ImageEditorControlPanelDelegate {
     func imageEditor(_ controlPanel: ImageEditorControlPanel, didEndEditing mode: ImageEditorControlPanel.EditMode) {
         // update nav bar
     }
-
 }

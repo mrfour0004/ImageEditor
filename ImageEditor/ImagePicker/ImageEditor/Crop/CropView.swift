@@ -152,7 +152,7 @@ class CropView: UIView {
     private var backgroundContainerView: UIView!
 
     /// A copy of the background image view, placed over the dimming views
-    private var foregroundImageView: UIImageView!
+    var foregroundImageView: UIImageView!
 
     /// A container view that clips the foreground image view to the crop box frame
     private var foregroundContainerView = UIView(frame: CGRect(origin: .zero, size: CGSize(width: 200, height: 200)))

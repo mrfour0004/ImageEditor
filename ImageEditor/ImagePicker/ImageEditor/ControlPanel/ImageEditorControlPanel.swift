@@ -11,7 +11,7 @@ import UIKit
 protocol ImageEditorControlPanelDelegate: AnyObject {
     func imageEditorDidTapRotateButton(_ controlPanel: ImageEditorControlPanel)
     func imageEditor(_ controlPanel: ImageEditorControlPanel, didCancelEditing mode: ImageEditorControlPanel.EditMode)
-    func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueChangedTo value: Int, for editingMode: ImageEditorControlPanel.EditMode)
+    func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueChangedTo value: Float, for editingMode: ImageEditorControlPanel.EditMode)
     func imageEditor(_ controlPanel: ImageEditorControlPanel, willBedingEditing mode: ImageEditorControlPanel.EditMode)
     func imageEditor(_ controlPanel: ImageEditorControlPanel, didEndEditing mode: ImageEditorControlPanel.EditMode)
 }
@@ -23,13 +23,21 @@ class ImageEditorControlPanel: UIView, NibLoadable {
     enum EditMode {
         case brightness
         case contrast
+
+        var ciInputKey: String {
+            switch self {
+            case .brightness: return kCIInputBrightnessKey
+            case .contrast: return kCIInputContrastKey
+            }
+        }
     }
 
     weak var delegate: ImageEditorControlPanelDelegate?
+    var editedValueDictionary: [EditMode: Int] = [:]
 
     private var sliderView: ImageEditorSliderView?
-    private var editedValueDictionary: [EditMode: Int] = [:]
     private var editingMode: EditMode?
+
 
     // MARK: - IBActions
 
@@ -64,6 +72,15 @@ class ImageEditorControlPanel: UIView, NibLoadable {
         sliderView.show(animated: true)
     }
 
+    private func convert(_ sliderValue: Int, to editMode: EditMode) -> Float {
+        switch editMode {
+        case .brightness:
+            return Float(sliderValue) / 2000.00
+        case .contrast:
+            return (Float(sliderValue) / 400.00) + 1.00
+        }
+    }
+
 }
 
 // MARK: - ImageEditorSliderDelegate Methods
@@ -82,7 +99,8 @@ extension ImageEditorControlPanel: ImageEditorSliderDelegate {
 
     func sliderViewDidChange(_ sliderView: ImageEditorSliderView) {
         guard let editingMode = editingMode else { return }
-        delegate?.imageEditor(self, sliderValueChangedTo: sliderView.sliderValue, for: editingMode)
+        let convertedValue = convert(sliderView.sliderValue, to: editingMode)
+        delegate?.imageEditor(self, sliderValueChangedTo: convertedValue, for: editingMode)
     }
 
     func sliderViewDidCancelEditing(_ sliderView: ImageEditorSliderView) {
@@ -94,4 +112,21 @@ extension ImageEditorControlPanel: ImageEditorSliderDelegate {
         }
     }
 
+}
+
+extension Int {
+    func converted(to editMode: ImageEditorControlPanel.EditMode) -> Float {
+        switch editMode {
+        case .brightness:
+            return Float(self) / 2000.00
+        case .contrast:
+            return (Float(self) / 400.00) + 1.00
+        }
+    }
+}
+
+extension Dictionary where Key == ImageEditorControlPanel.EditMode, Value == Int {
+    var ciInputValueConverted: [ImageEditorControlPanel.EditMode: Float] {
+        return Dictionary<ImageEditorControlPanel.EditMode, Float>(uniqueKeysWithValues: self.map { ($0.key, $0.value.converted(to: $0.key)) })
+    }
 }
