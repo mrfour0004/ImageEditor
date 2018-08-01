@@ -63,6 +63,12 @@ extension ImagePickerController: UINavigationControllerDelegate {
 
 extension ImagePickerController: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard gestureRecognizer === interactivePopGestureRecognizer else { return true }
+
+        if let topViewController = topViewController as? ImageEditorViewController {
+            return !topViewController.isEditing
+        }
+
         return viewControllers.count > 1
     }
 }

@@ -20,7 +20,7 @@ class ImageEditorControlPanel: UIView, NibLoadable {
 
     // MARK: - Properties
 
-    enum EditMode {
+    enum EditMode: CustomStringConvertible {
         case brightness
         case contrast
 
@@ -28,6 +28,20 @@ class ImageEditorControlPanel: UIView, NibLoadable {
             switch self {
             case .brightness: return kCIInputBrightnessKey
             case .contrast: return kCIInputContrastKey
+            }
+        }
+
+        var ciDefaultValue: Float {
+            switch self {
+            case .brightness: return 0.00
+            case .contrast: return 1.00
+            }
+        }
+
+        var description: String {
+            switch self {
+            case .brightness: return NSLocalizedString("Brightness", comment: "")
+            case .contrast: return NSLocalizedString("Contrast", comment: "")
             }
         }
     }

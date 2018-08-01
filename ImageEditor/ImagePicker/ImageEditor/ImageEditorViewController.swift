@@ -13,14 +13,11 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
     // MARK: - Properties
 
     var image: UIImage!
-    var isProcessingImage = false
+    private var isProcessingImage = false
 
-    lazy var ciContext: CIContext = CIContext(options: nil)
-    lazy var ciFilter: CIFilter = {
-        let filter = CIFilter(name: "CIColorControls")!
-        filter.setValue(CIImage(image: image)!, forKey: kCIInputImageKey)
-        return filter
-    }()
+    var ciContext: CIContext!
+    var ciFilter: CIFilter!
+    var ciQueue = DispatchQueue(label: "ci queue")
 
     var isAspectRatioLockEnabled: Bool {
         get { return cropView.isAspectRatioLockEnabled }
@@ -50,6 +47,7 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
     private lazy var controlPanel: ImageEditorControlPanel = ImageEditorControlPanel.instantiateFromNib()
     private lazy var cropView = CropView(image: image)
+    private lazy var doneButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(didTapDoneButton))
 
     // MARK: - View Lifecycle
 
@@ -58,11 +56,10 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
         automaticallyAdjustsScrollViewInsets = false
         isAspectRatioLockEnabled = imagePicker.isAspectRatioLockEnabled
-        
-        updateCropViewFrame()
 
-        setupNavigationItem()
-        setupView()
+        updateNavigationItem(for: nil, animated: false)
+        setupCropView()
+        setupCIContext()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -79,7 +76,6 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
         if animated {
             if cropView.isGridOverlayHidden {
                 cropView.setGridOverlayHidden(false, animated: true)
@@ -117,18 +113,45 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
     // MARK: - Setup Views
 
-    private func setupNavigationItem() {
-        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(didTapDoneButton))
-        navigationItem.rightBarButtonItem = doneButton
-    }
+    private func setupCropView() {
+        updateCropViewFrame()
 
-    private func setupView() {
+        // prevent enlarged image exceeding `view.bounds` when navigating to previous view controller.
         view.clipsToBounds = true
+
         view.insertSubview(cropView, at: 0)
         view.backgroundColor = cropView.backgroundColor
     }
 
-    // MARK: - Convenience Methods
+    private func setupCIContext() {
+        ciContext = CIContext(options: nil)
+
+        ciFilter = CIFilter(name: "CIColorControls")!
+        ciFilter.setValue(CIImage(image: image)!, forKey: kCIInputImageKey)
+    }
+
+    /// Update the UI of `navigtaionItem` by the given `editMode`.
+    /// Set `editMode` as `nil` to end the editing mode.
+    private func updateNavigationItem(for editMode: ImageEditorControlPanel.EditMode?, animated: Bool) {
+        if let editMode = editMode {
+            navigationItem.hidesBackButton = true
+            navigationItem.rightBarButtonItem = nil
+            title = editMode.description
+        } else {
+            navigationItem.hidesBackButton = false
+            navigationItem.rightBarButtonItem = doneButton
+            title = "Edit Image"
+        }
+
+        guard animated else { return }
+
+        let fadeTransition = CATransition()
+        fadeTransition.duration = 0.15
+        fadeTransition.type = kCATransitionFade
+        navigationController?.navigationBar.layer.add(fadeTransition, forKey: nil)
+    }
+
+    // MARK: - CropView Methods
 
     private func updateCropViewFrame() {
         cropView.frame = view.bounds
@@ -145,19 +168,13 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
     }
 
     private func cropImage() {
-        let croppedImage = self.croppedImage
+        let croppedImage = cropView.croppedImage
 
         ciFilter.setValue(CIImage(image: croppedImage), forKey: kCIInputImageKey)
         let outputImage = self.ciFilter.outputImage!
         let filteredImage = self.ciContext.createCGImage(outputImage, from: outputImage.extent)!
 
         imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: UIImage(cgImage: filteredImage, scale: UIScreen.main.scale, orientation: croppedImage.imageOrientation))
-    }
-
-    private var croppedImage: UIImage {
-        let cropFrame = cropView.imageCropFrame
-        let angle = cropView.angle
-        return image.cropped(with: cropFrame, angle: angle)
     }
 
     private func setAspectRatioPreset(_ aspectRatioPreset: CropAspectRatioPreset, animated: Bool) {
@@ -181,33 +198,73 @@ extension ImageEditorViewController: ImageEditorControlPanelDelegate {
     }
 
     func imageEditor(_ controlPanel: ImageEditorControlPanel, didCancelEditing mode: ImageEditorControlPanel.EditMode) {
-        // update nav bar
-        // updateImage(for: mode, value: editedValue)
+        updateNavigationItem(for: nil, animated: true)
+        isEditing = false
+        cropView.isAllowEditing = true
+
+        let dict = controlPanel.editedValueDictionary.ciInputValueConverted
+        ciQueue.async {
+            self.ciFilter.setValue(CIImage(image: self.image), forKey: kCIInputImageKey)
+            self.ciFilter.setValue(dict[mode] ?? mode.ciDefaultValue, forKey: mode.ciInputKey)
+        }
     }
 
     func imageEditor(_ controlPanel: ImageEditorControlPanel, sliderValueChangedTo value: Float, for editingMode: ImageEditorControlPanel.EditMode) {
         guard !isProcessingImage else { return }
         isProcessingImage = true
 
+        ciQueue.async {
+            print("set \(editingMode.description): \(self.ciFilter.value(forKey: editingMode.ciInputKey)!)")
 
-        DispatchQueue.global().async {
-            print("converted value: \(value)")
             self.ciFilter.setValue(value, forKey: editingMode.ciInputKey)
             let outputImage = self.ciFilter.outputImage!
-            let filteredImage = self.ciContext.createCGImage(outputImage, from: outputImage.extent)!
+            let cgImage = self.ciContext.createCGImage(outputImage, from: outputImage.extent)!
 
             DispatchQueue.main.async {
-                self.cropView.foregroundImageView.image = UIImage(cgImage: filteredImage, scale: UIScreen.main.scale, orientation: self.image.imageOrientation)
+                if let imageViewForFilter = self.cropView.imageViewForFilter {
+                    imageViewForFilter.image = UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: imageViewForFilter.image!.imageOrientation)
+                }
             }
+
             self.isProcessingImage = false
         }
     }
 
     func imageEditor(_ controlPanel: ImageEditorControlPanel, willBedingEditing mode: ImageEditorControlPanel.EditMode) {
-        // update nav bar
+        updateNavigationItem(for: mode, animated: true)
+        isEditing = true
+        cropView.isAllowEditing = false
+
+        guard
+            let imageViewForFilter = cropView.imageViewForFilter,
+            let croppedImage = self.cropView.croppedImage.resize(toHeight: imageViewForFilter.frame.height)
+        else { return }
+
+        ciQueue.async {
+            self.ciFilter.setValue(CIImage(image: croppedImage), forKey: kCIInputImageKey)
+
+            let outputImage = self.ciFilter.outputImage!
+            let cgImage = self.ciContext.createCGImage(outputImage, from: outputImage.extent)!
+
+            DispatchQueue.main.async {
+                imageViewForFilter.image = UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: croppedImage.imageOrientation)
+            }
+        }
     }
 
     func imageEditor(_ controlPanel: ImageEditorControlPanel, didEndEditing mode: ImageEditorControlPanel.EditMode) {
-        // update nav bar
+        updateNavigationItem(for: nil, animated: true)
+
+        ciQueue.async {
+            self.ciFilter.setValue(CIImage(image: self.image), forKey: kCIInputImageKey)
+            let outputImage = self.ciFilter.outputImage!
+            let cgImage = self.ciContext.createCGImage(outputImage, from: outputImage.extent)!
+            DispatchQueue.main.async {
+                self.cropView.foregroundImageView.image = UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: self.image.imageOrientation)
+                self.isEditing = false
+                self.cropView.isAllowEditing = true
+            }
+        }
     }
+
 }

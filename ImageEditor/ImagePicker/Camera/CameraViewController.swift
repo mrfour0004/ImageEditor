@@ -120,7 +120,6 @@ class CameraViewController: UIViewController, StoryboardLoadable {
             connect.videoOrientation = videoPreviewLayerOrientation!
 
             CameraViewController.setFlashMode(self.flashMode, for: self.videoDeviceInput.device)
-            //self.photoOutput.prepareToCaptureStillImageBracket(from: connect, withSettingsArray: <#T##[AVCaptureBracketedStillImageSettings]#>, completionHandler: <#T##(Bool, Error?) -> Void#>)
 
             self.photoOutput.captureStillImageAsynchronously(from: connect, completionHandler: { imageDataSampleBuffer, error in
                 guard let imageDataSampleBuffer = imageDataSampleBuffer else {

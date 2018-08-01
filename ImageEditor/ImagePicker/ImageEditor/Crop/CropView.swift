@@ -24,6 +24,9 @@ class CropView: UIView {
 
     weak var delegate: CropViewDelegate?
 
+    /// The rotation angle of the crop view (Will always be negative as it rotates in a counter-clockwise direction)
+    var angle: Int = 0
+
     /// Inset the workable region of the crop view in case in order to make space for accessory views
     var cropRegionInset: UIEdgeInsets = .zero
 
@@ -59,13 +62,26 @@ class CropView: UIView {
         }
     }
 
+    var isAllowEditing: Bool = false {
+        didSet {
+            isUserInteractionEnabled = isAllowEditing
+            setGridOverlayHidden(!isAllowEditing, animated: true)
+
+            if isAllowEditing {
+                removeImageForFilter()
+            } else {
+                createImageForFilter()
+            }
+        }
+    }
+
+    var croppedImage: UIImage {
+        return image.cropped(with: imageCropFrame, angle: angle)
+    }
 
     // MARK: - Properties
 
     private let image: UIImage
-
-    /// The rotation angle of the crop view (Will always be negative as it rotates in a counter-clockwise direction)
-    var angle: Int = 0
     private var isEditing: Bool = false
     private var cropBoxResizeEnabled = false
 
@@ -144,6 +160,7 @@ class CropView: UIView {
     // MARK: - Properteis - Views
 
     var scrollView: CropScrollView!
+    var imageViewForFilter: UIImageView?
 
     /// The main image view, placed within the scroll view
     private var backgroundImageView: UIImageView!
@@ -227,7 +244,14 @@ class CropView: UIView {
     }
 
     func setGridOverlayHidden(_ isHidden: Bool, animated: Bool) {
+        isGridOverlayHidden = isHidden
 
+        let animations: () -> Void = {
+            self.gridOverlayView.alpha = isHidden ? 0 : 1
+        }
+
+        guard animated else { return animations() }
+        UIView.animate(withDuration: 0.15, animations: animations)
     }
 
     var cropBoxAspectRatioIsPortrait: Bool {
@@ -1006,6 +1030,21 @@ private extension CropView {
 
     var hasAspectRatio: Bool {
         return (aspectRatio.width > CGFloat.ulpOfOne) && (aspectRatio.height > CGFloat.ulpOfOne)
+    }
+
+    func createImageForFilter() {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .clear
+        imageView.frame = foregroundContainerView.bounds
+        imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
+        foregroundContainerView.addSubview(imageView)
+        imageViewForFilter = imageView
+    }
+
+    func removeImageForFilter() {
+        imageViewForFilter?.removeFromSuperview()
+        imageViewForFilter = nil
     }
 
     func checkForCanReset() {
