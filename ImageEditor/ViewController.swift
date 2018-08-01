@@ -61,7 +61,11 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
 extension ViewController: ImagePickerControllerDelegate {
     func imagePicker(_ picker: ImagePickerController, didFinishPickingImage image: UIImage) {
         imageView.image = image
-        dismiss(animated: true, completion: nil)
+        imageView.isHidden = true
+        picker.dismissAnimated(withCroppedImage: image, toView: imageView) {
+            self.imageView.isHidden = false
+        }
+        //dismiss(animated: true, completion: nil)
     }
 
     func imagePickerDidCancel(_ picker: ImagePickerController) {

@@ -45,8 +45,8 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
     // MARK: - Views
 
+    lazy var cropView = CropView(image: image)
     private lazy var controlPanel: ImageEditorControlPanel = ImageEditorControlPanel.instantiateFromNib()
-    private lazy var cropView = CropView(image: image)
     private lazy var doneButton: UIBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(didTapDoneButton))
 
     // MARK: - View Lifecycle
@@ -186,7 +186,7 @@ class ImageEditorViewController: UIViewController, StoryboardLoadable {
 
         cropView.setAspectRatio(aspectRatio, animated: animated)
     }
-    
+
 }
 
 // MARK: - ImageEditorControlPanelDelegate Methods

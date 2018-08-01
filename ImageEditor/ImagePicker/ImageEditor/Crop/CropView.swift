@@ -132,7 +132,7 @@ class CropView: UIView {
     private var resetTimer: Timer?
 
     private var _cropBoxFrame: CGRect = .zero
-    private var cropBoxFrame: CGRect {
+    var cropBoxFrame: CGRect {
         get { return _cropBoxFrame }
         set { setCropBoxFrame(newValue) }
     }
@@ -252,6 +252,22 @@ class CropView: UIView {
 
         guard animated else { return animations() }
         UIView.animate(withDuration: 0.15, animations: animations)
+    }
+
+    func setCroppingViewHidden(_ isHidden: Bool, animated: Bool) {
+        let alpha: CGFloat = isHidden ? 0 : 1
+
+        foregroundContainerView.alpha = alpha
+        backgroundImageView.alpha = alpha
+
+        let animations: () -> Void = {
+            self.gridOverlayView.alpha = alpha
+            self.toggleTranslucencyViewVisible(!isHidden)
+        }
+
+        guard animated else { return animations() }
+
+        UIView.animate(withDuration: 0.3, animations: animations)
     }
 
     var cropBoxAspectRatioIsPortrait: Bool {

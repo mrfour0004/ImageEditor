@@ -21,6 +21,7 @@ class ImagePickerController: UINavigationController {
     var allowsEditing = false
     var cropAspectRatioPreset: CropAspectRatioPreset = .original
     var isAspectRatioLockEnabled: Bool = false
+    private var transitionController = ImagePickerControllerTransitioning()
 
     weak var pickerDelegate: ImagePickerControllerDelegate?
 
@@ -28,12 +29,30 @@ class ImagePickerController: UINavigationController {
 
     convenience init() {
         self.init(rootViewController: CameraViewController.instantiateFromStoryboard())
+        transitioningDelegate = self
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
         interactivePopGestureRecognizer?.delegate = self
+    }
+
+    // MARK: - Methods
+
+    func dismissAnimated(withCroppedImage image: UIImage, toView: UIView, completion: (() -> Void)?) {
+        guard let imageEditorViewController = viewControllers.filter({ $0 is ImageEditorViewController }).first as? ImageEditorViewController else {
+            presentingViewController?.dismiss(animated: true, completion: completion)
+            return
+        }
+        let cropView = imageEditorViewController.cropView
+        cropView.setCroppingViewHidden(true, animated: false)
+        transitionController.isDismissing = true
+        transitionController.image = image
+        transitionController.fromFrame = cropView.convert(cropView.cropBoxFrame, to: view)
+        transitionController.toView = toView
+
+        presentingViewController?.dismiss(animated: true, completion: completion)
     }
 }
 
@@ -70,5 +89,13 @@ extension ImagePickerController: UIGestureRecognizerDelegate {
         }
 
         return viewControllers.count > 1
+    }
+}
+
+// MARK: - UIViewControllerTransitioningDelegate Methods
+
+extension ImagePickerController: UIViewControllerTransitioningDelegate {
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return transitionController
     }
 }
