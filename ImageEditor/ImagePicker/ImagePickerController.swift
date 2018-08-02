@@ -21,7 +21,7 @@ class ImagePickerController: UINavigationController {
     var allowsEditing = false
     var cropAspectRatioPreset: CropAspectRatioPreset = .original
     var isAspectRatioLockEnabled: Bool = false
-    private var transitionController = ImagePickerControllerTransitioning()
+    private var transitionController: ImagePickerControllerTransitioning?
 
     weak var pickerDelegate: ImagePickerControllerDelegate?
 
@@ -47,12 +47,19 @@ class ImagePickerController: UINavigationController {
         }
         let cropView = imageEditorViewController.cropView
         cropView.setCroppingViewHidden(true, animated: false)
+
+        let transitionController = ImagePickerControllerTransitioning()
         transitionController.isDismissing = true
         transitionController.image = image
         transitionController.fromFrame = cropView.convert(cropView.cropBoxFrame, to: view)
         transitionController.toView = toView
 
-        presentingViewController?.dismiss(animated: true, completion: completion)
+        self.transitionController = transitionController
+
+        presentingViewController?.dismiss(animated: true, completion: {
+            completion?()
+            self.transitionController = nil
+        })
     }
 }
 

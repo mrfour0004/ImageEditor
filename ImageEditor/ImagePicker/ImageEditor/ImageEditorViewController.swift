@@ -205,7 +205,7 @@ extension ImageEditorViewController: ImageEditorControlPanelDelegate {
         let dict = controlPanel.editedValueDictionary.ciInputValueConverted
         ciQueue.async {
             self.ciFilter.setValue(CIImage(image: self.image), forKey: kCIInputImageKey)
-            self.ciFilter.setValue(dict[mode] ?? mode.ciDefaultValue, forKey: mode.ciInputKey)
+            self.ciFilter.setValue(dict[mode].or(mode.ciDefaultValue), forKey: mode.ciInputKey)
         }
     }
 

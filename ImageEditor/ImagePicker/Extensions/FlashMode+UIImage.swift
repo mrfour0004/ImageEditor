@@ -13,11 +13,11 @@ extension AVCaptureDevice.FlashMode {
     var icon: UIImage {
         switch self {
         case .auto:
-            return .flashAuto
+            return #imageLiteral(resourceName: "ic_flashlight_auto_white100")
         case .on:
-            return .flashOn
+            return #imageLiteral(resourceName: "ic_flashlight_on_white100")
         case .off:
-            return .flashOff
+            return #imageLiteral(resourceName: "ic_flashlight_off_white100")
         }
     }
 

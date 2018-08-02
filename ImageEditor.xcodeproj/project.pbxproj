@@ -20,6 +20,7 @@
 		5E4476D32107773400889636 /* ImageEditorControlPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E4476D22107773400889636 /* ImageEditorControlPanel.xib */; };
 		5E4476D7210781C100889636 /* ImageEditorControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4476D6210781C100889636 /* ImageEditorControlButton.swift */; };
 		5E4477112108BB2500889636 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4477102108BB2500889636 /* NibLoadable.swift */; };
+		5E5054A32112C2FA0055E17F /* Optional+NilCoalescing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5054A22112C2FA0055E17F /* Optional+NilCoalescing.swift */; };
 		5E5894CD20EFACB600193CEB /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5894CC20EFACB600193CEB /* CameraViewController.swift */; };
 		5E5894CF20EFAF1D00193CEB /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5894CE20EFAF1D00193CEB /* PreviewView.swift */; };
 		5E5894D120EFC19000193CEB /* LegacyCameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5894D020EFC19000193CEB /* LegacyCameraViewController.swift */; };
@@ -39,7 +40,6 @@
 		5E8CB0DD210F02BA009B5C02 /* ImageEditorSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8CB0DC210F02BA009B5C02 /* ImageEditorSliderView.swift */; };
 		5E8CB0DF210F02C2009B5C02 /* ImageEditorSliderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E8CB0DE210F02C2009B5C02 /* ImageEditorSliderView.xib */; };
 		5EA2F792210FFDA300325CC5 /* UISlider+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA2F791210FFDA300325CC5 /* UISlider+Extension.swift */; };
-		5EC3F00320F9C391001D811D /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC3F00220F9C391001D811D /* Images.swift */; };
 		5EDE5E6820F9C99D00614CE9 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */; };
 		5EDE5E6A20F9CF9800614CE9 /* FlashMode+UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */; };
 		5EDE5E6E20F9F06E00614CE9 /* CameraButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EDE5E6D20F9F06E00614CE9 /* CameraButton.swift */; };
@@ -64,6 +64,7 @@
 		5E4476D22107773400889636 /* ImageEditorControlPanel.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageEditorControlPanel.xib; sourceTree = "<group>"; };
 		5E4476D6210781C100889636 /* ImageEditorControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditorControlButton.swift; sourceTree = "<group>"; };
 		5E4477102108BB2500889636 /* NibLoadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NibLoadable.swift; sourceTree = "<group>"; };
+		5E5054A22112C2FA0055E17F /* Optional+NilCoalescing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+NilCoalescing.swift"; sourceTree = "<group>"; };
 		5E5894CC20EFACB600193CEB /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		5E5894CE20EFAF1D00193CEB /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 		5E5894D020EFC19000193CEB /* LegacyCameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacyCameraViewController.swift; sourceTree = "<group>"; };
@@ -83,7 +84,6 @@
 		5E8CB0DC210F02BA009B5C02 /* ImageEditorSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditorSliderView.swift; sourceTree = "<group>"; };
 		5E8CB0DE210F02C2009B5C02 /* ImageEditorSliderView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageEditorSliderView.xib; sourceTree = "<group>"; };
 		5EA2F791210FFDA300325CC5 /* UISlider+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UISlider+Extension.swift"; sourceTree = "<group>"; };
-		5EC3F00220F9C391001D811D /* Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
 		5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlashMode+UIImage.swift"; sourceTree = "<group>"; };
 		5EDE5E6D20F9F06E00614CE9 /* CameraButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraButton.swift; sourceTree = "<group>"; };
@@ -115,6 +115,7 @@
 		5E1154EB20F64BDF00D4C434 /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				5EDE5E6D20F9F06E00614CE9 /* CameraButton.swift */,
 				5E5894CC20EFACB600193CEB /* CameraViewController.swift */,
 				5E5894D220F070A000193CEB /* CameraViewController.storyboard */,
 				5E5894D020EFC19000193CEB /* LegacyCameraViewController.swift */,
@@ -229,8 +230,6 @@
 		5EC3F00120F9C37A001D811D /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				5EC3F00220F9C391001D811D /* Images.swift */,
-				5EDE5E6D20F9F06E00614CE9 /* CameraButton.swift */,
 				5E885D9C21129D73008F017B /* TapticEngine.swift */,
 			);
 			path = Utils;
@@ -240,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				5EDE5E6920F9CF9800614CE9 /* FlashMode+UIImage.swift */,
+				5E5054A22112C2FA0055E17F /* Optional+NilCoalescing.swift */,
 				5E8BC5ED20FDEEBD00C0AFD4 /* UIImage+CropRotate.swift */,
 				5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */,
 				5EA2F791210FFDA300325CC5 /* UISlider+Extension.swift */,
@@ -373,6 +373,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5E8BC5EC20FDE4E700C0AFD4 /* ImageEditorViewController.swift in Sources */,
+				5E5054A32112C2FA0055E17F /* Optional+NilCoalescing.swift in Sources */,
 				5E5894D720F0C22F00193CEB /* AVCaptureVideoOrientation+UIOrientation.swift in Sources */,
 				5E8BC5EE20FDEEBD00C0AFD4 /* UIImage+CropRotate.swift in Sources */,
 				5EDE5E6A20F9CF9800614CE9 /* FlashMode+UIImage.swift in Sources */,
@@ -386,7 +387,6 @@
 				5E10B8D421000E3D00E8838C /* CropOverlayView.swift in Sources */,
 				5E4477112108BB2500889636 /* NibLoadable.swift in Sources */,
 				5E1A23F7210B514700A52346 /* CropAspectRatio.swift in Sources */,
-				5EC3F00320F9C391001D811D /* Images.swift in Sources */,
 				5E8CB0DD210F02BA009B5C02 /* ImageEditorSliderView.swift in Sources */,
 				5E35539920E75B140089F433 /* AppDelegate.swift in Sources */,
 				5E10B8D220FF840500E8838C /* CropView.swift in Sources */,

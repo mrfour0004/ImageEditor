@@ -32,11 +32,12 @@ class CameraViewController: UIViewController, StoryboardLoadable {
     @IBOutlet private weak var flashButton: CameraButton!
     @IBOutlet private weak var libraryButton: CameraButton!
     @IBOutlet private weak var shutterButton: CameraButton!
+    @IBOutlet private weak var switchCameraButton: CameraButton!
 
     // MARK: - Capturing photos
 
     private var flashMode: AVCaptureDevice.FlashMode = .off {
-        didSet { updateFlashButton() }
+        didSet { updateFlashButtonIcon() }
     }
     private var photoOutput: AVCaptureStillImageOutput!
     private var isCapturingPhoto = false
@@ -72,6 +73,14 @@ class CameraViewController: UIViewController, StoryboardLoadable {
         flashMode.switch()
     }
 
+    @IBAction func didClickSwitchCameraButton(_ sender: Any) {
+        flipCamera()
+    }
+
+    @IBAction func didClickCloseButton(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+
     @IBAction private func didTapPreviewView(_ gestureRecognizer: UITapGestureRecognizer) {
         let devicePoint = previewView.videoPreviewLayer.captureDevicePointConverted(fromLayerPoint: gestureRecognizer.location(in: gestureRecognizer.view))
         focus(with: .autoFocus, exposureMode: .autoExpose, at: devicePoint, monitorSubjectAreaChange: true)
@@ -82,7 +91,7 @@ class CameraViewController: UIViewController, StoryboardLoadable {
         }
     }
 
-    private func updateFlashButton() {
+    private func updateFlashButtonIcon() {
         let fakeButton = flashButton.snapshotView(afterScreenUpdates: false)!
         view.addSubview(fakeButton)
         fakeButton.frame = flashButton.superview!.convert(flashButton.frame, to: view)
@@ -105,6 +114,30 @@ class CameraViewController: UIViewController, StoryboardLoadable {
             self.flashButton.transform = .identity
             self.flashButton.alpha = 1
         }, completion: nil)
+    }
+
+    private func onVideoDevicePositionChange() {
+        let preferredFalshButtonHidden: Bool
+        switch self.videoDeviceInput.device.position {
+        case .front, .unspecified:
+            preferredFalshButtonHidden = true
+        case .back:
+            preferredFalshButtonHidden = false
+        }
+
+        UIView.transition(with: flashButton.superview!, duration: 0.3, options: [.beginFromCurrentState, .curveEaseInOut], animations: {
+            self.flashButton.isHidden = preferredFalshButtonHidden
+        }, completion: nil)
+
+        UIView.animate(withDuration: 0.15, delay: preferredFalshButtonHidden ? 0 : 0.15, options: .beginFromCurrentState, animations: {
+            self.flashButton.alpha = preferredFalshButtonHidden ? 0 : 1
+        }, completion: nil)
+
+        UIView.transition(with: switchCameraButton, duration: 0.3, options: [], animations: {
+            self.switchCameraButton.transform = CGAffineTransform(rotationAngle: CGFloat.pi)
+        }, completion: { _ in
+            self.switchCameraButton.transform = .identity
+        })
     }
 
     private func capturePhoto(completion: @escaping (_ image: UIImage) -> Void) {
@@ -178,17 +211,7 @@ class CameraViewController: UIViewController, StoryboardLoadable {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //showTranslucencyView(animated: false)
-        sessionQueue.async {
-            switch self.setupResult {
-            case .success:
-                self.addObservers()
-                self.session.startRunning()
-                self.isSessionRunning = self.session.isRunning
-            default:
-                break
-            }
-        }
+        startRunningSession()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -197,13 +220,7 @@ class CameraViewController: UIViewController, StoryboardLoadable {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        sessionQueue.async {
-            guard self.setupResult == .success else { return }
-
-            self.session.stopRunning()
-            self.isSessionRunning = self.session.isRunning
-            self.removeObservers()
-        }
+        stopRunningSession()
 
         super.viewWillDisappear(animated)
     }
@@ -277,7 +294,8 @@ private extension CameraViewController {
         view.backgroundColor = .black
 
         setupButton(flashButton, image: flashMode.icon)
-        setupButton(libraryButton, image: .photoLibrary)
+        setupButton(libraryButton, image: #imageLiteral(resourceName: "ic_album_white100"))
+        setupButton(switchCameraButton, image: #imageLiteral(resourceName: "ic_switch camera_white100"))
     }
 
     func setupButton(_ button: UIButton, image: UIImage) {
@@ -338,7 +356,7 @@ private extension CameraViewController {
             session.commitConfiguration()
         }
 
-        guard let defaultVideoDevice = AVCaptureDevice.defaultCamera() else { return }
+        guard let defaultVideoDevice = AVCaptureDevice.defaultCamera(position: .back) else { return }
 
         do {
             let videoDeviceInput = try AVCaptureDeviceInput(device: defaultVideoDevice)
@@ -378,6 +396,38 @@ private extension CameraViewController {
         }
 
         session.commitConfiguration()
+    }
+
+    private func startRunningSession() {
+        sessionQueue.async {
+            switch self.setupResult {
+            case .success:
+                self.addObservers()
+                self.session.startRunning()
+                self.isSessionRunning = self.session.isRunning
+            case .notAuthorized:
+                DispatchQueue.main.async {
+                    self.requestCameraPermission()
+                }
+            case .configurationFailed:
+                break
+                // show alert or somthing
+            }
+        }
+    }
+
+    private func stopRunningSession() {
+        sessionQueue.async {
+            if self.setupResult == .success {
+                self.session.stopRunning()
+                self.isSessionRunning = self.session.isRunning
+                self.removeObservers()
+            }
+        }
+    }
+
+    func requestCameraPermission() {
+        // present alert or something
     }
 
     func addObservers() {
@@ -454,14 +504,16 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
 
 // MARK: - Camera
 
-private extension CameraViewController {
-    @objc func subjectAreaDidChange(_ notification: Notification) {
+extension CameraViewController {
+    @objc private func subjectAreaDidChange(_ notification: Notification) {
         let devicePoint = CGPoint(x: 0.5, y: 0.5)
         focus(with: .continuousAutoFocus, exposureMode: .continuousAutoExposure, at: devicePoint, monitorSubjectAreaChange: false)
     }
 
-    func focus(with focusMode: AVCaptureDevice.FocusMode, exposureMode: AVCaptureDevice.ExposureMode, at devicePoint: CGPoint, monitorSubjectAreaChange: Bool) {
+    private func focus(with focusMode: AVCaptureDevice.FocusMode, exposureMode: AVCaptureDevice.ExposureMode, at devicePoint: CGPoint, monitorSubjectAreaChange: Bool) {
         sessionQueue.async {
+            guard self.isSessionRunning else { return }
+
             let device = self.videoDeviceInput.device
             do {
                 try device.lockForConfiguration()
@@ -487,12 +539,55 @@ private extension CameraViewController {
             }
         }
     }
+
+    private func flipCamera() {
+        sessionQueue.async {
+            let currentVideoDevice = self.videoDeviceInput.device
+            let currentPosition = currentVideoDevice.position
+
+            let preferredPosition: AVCaptureDevice.Position
+
+            switch currentPosition {
+            case .unspecified, .front:
+                preferredPosition = .back
+            case .back:
+                preferredPosition = .front
+            }
+
+            guard let device = AVCaptureDevice.defaultCamera(position: preferredPosition) else { return }
+
+            do {
+                let videoDeviceInput = try AVCaptureDeviceInput(device: device)
+
+                self.session.beginConfiguration()
+
+                self.session.removeInput(self.videoDeviceInput)
+
+                if self.session.canAddInput(videoDeviceInput) {
+                    NotificationCenter.default.removeObserver(self, name: .AVCaptureDeviceSubjectAreaDidChange, object: currentVideoDevice)
+                    NotificationCenter.default.addObserver(self, selector: #selector(self.subjectAreaDidChange), name: .AVCaptureDeviceSubjectAreaDidChange, object: videoDeviceInput.device)
+
+                    self.session.addInput(videoDeviceInput)
+                    self.videoDeviceInput = videoDeviceInput
+                    DispatchQueue.main.async {
+                        self.onVideoDevicePositionChange()
+                    }
+                } else {
+                    self.session.addInput(self.videoDeviceInput)
+                }
+
+                self.session.commitConfiguration()
+            } catch {
+                print("Error occured while creating video device input: \(error)")
+            }
+        }
+    }
 }
 
 // MARK: - Configuration
 
 private extension CameraViewController {
     enum LayoutConfig {
-        static let flashIconSize = CGSize(width: 24, height: 24)
+        static let flashIconSize = CGSize(width: 36, height: 36)
     }
 }
