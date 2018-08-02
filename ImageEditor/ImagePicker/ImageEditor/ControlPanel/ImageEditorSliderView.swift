@@ -18,7 +18,7 @@ class Slider: UISlider {
 
     private lazy var trackLayer: CAShapeLayer = {
         let trackLayer = CAShapeLayer()
-        trackLayer.backgroundColor = UIColor.lightGray.cgColor
+        trackLayer.backgroundColor = UIColor(red:0.79, green:0.79, blue:0.79, alpha:1).cgColor
         layer.insertSublayer(trackLayer, at: 0)
         return trackLayer
     }()
@@ -56,7 +56,7 @@ class ImageEditorSliderView: UIView, NibLoadable {
 
     // MARK: - IBOutlets
 
-    @IBOutlet private weak var slider: UISlider!
+    @IBOutlet private weak var slider: Slider!
     @IBOutlet private weak var buttonStackView: UIStackView!
 
     // MARK: - Views
@@ -68,7 +68,7 @@ class ImageEditorSliderView: UIView, NibLoadable {
     enum Const {
         static let maxSliderValue: Int = 100
         static let minSliderValue: Int = -100
-        static let sliderZeroBuffer: Int = 5
+        static let sliderZeroBuffer: Int = 8
         static let thumbImage = #imageLiteral(resourceName: "ic_sliders_white100")
     }
 
@@ -97,7 +97,7 @@ class ImageEditorSliderView: UIView, NibLoadable {
             case -100...(-1):
                 value = newValue - Const.sliderZeroBuffer
             default:
-                hasEnteredHapticZone = true
+                hasEnteredTapticZone = true
                 value = 0
             }
             slider.value = Float(value)
@@ -106,7 +106,10 @@ class ImageEditorSliderView: UIView, NibLoadable {
 
     /// A flag to decide whether to generate haptic feedback when the slider value has enter zero buffer zone
     /// or has reached the maximum/minimum value. Default value is `true`.
-    private var hasEnteredHapticZone: Bool = true
+    private var hasEnteredTapticZone: Bool = true
+
+    /// Return whether the slider is beging dragged.
+    private var isDragging: Bool = false
 
     // MARK: - View Lifecycle
 
@@ -123,8 +126,7 @@ class ImageEditorSliderView: UIView, NibLoadable {
         autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    override func draw(_ rect: CGRect) {
         updateValueLabel(animated: false)
     }
 
@@ -137,11 +139,11 @@ class ImageEditorSliderView: UIView, NibLoadable {
         }
 
         alpha = 0
-        buttonStackView.transform = CGAffineTransform(translationX: 0, y: buttonStackView.frame.height)
+        transform = CGAffineTransform(translationX: 0, y: frame.height)
         
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .beginFromCurrentState, animations: {
+        UIView.animate(withDuration: 0.3, delay: 0.15, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .beginFromCurrentState, animations: {
             self.alpha = 1
-            self.buttonStackView.transform = .identity
+            self.transform = .identity
         }, completion: nil)
     }
 
@@ -150,9 +152,9 @@ class ImageEditorSliderView: UIView, NibLoadable {
             return removeFromSuperview()
         }
 
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .beginFromCurrentState, animations: {
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseIn], animations: {
             self.alpha = 0
-            self.buttonStackView.transform = CGAffineTransform(translationX: 0, y: self.buttonStackView.frame.height)
+            self.transform = CGAffineTransform(translationX: 0, y: self.buttonStackView.frame.height/2)
         }, completion: { _ in
             self.removeFromSuperview()
         })
@@ -194,9 +196,12 @@ class ImageEditorSliderView: UIView, NibLoadable {
     // MARK: - Private Methods
 
     private func updateValueLabel(animated: Bool) {
-        let roundedValue: Int = sliderValue
-        valueLabel.text = String(describing: roundedValue)
-        valueLabel.sizeToFit()
+        let sliderValue = self.sliderValue
+
+        if sliderValue != 0 {
+            valueLabel.text = String(describing: sliderValue)
+            valueLabel.sizeToFit()
+        }
 
         let thumbRect = slider.convert(slider.thumbRect, to: self)
 
@@ -204,17 +209,15 @@ class ImageEditorSliderView: UIView, NibLoadable {
         valueLabel.frame.origin.y -= thumbRect.height/CGFloat(2) + CGFloat(4) + valueLabel.frame.height/CGFloat(2)
 
         guard animated else {
-            valueLabel.alpha = (roundedValue == 0) ? 0 : 1
+            valueLabel.alpha = (sliderValue == 0) ? 0 : 1
             return
         }
 
-        let needsShowValueLabel: Bool = (roundedValue != 0)
-        let transform: CGAffineTransform = needsShowValueLabel ? .identity : CGAffineTransform(scaleX: 0.8, y: 0.8)
+        let needsShowValueLabel: Bool = (sliderValue != 0)
         let alpha: CGFloat = needsShowValueLabel ? 1 : 0
 
-        UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 0.7, options: .beginFromCurrentState, animations: {
+        UIView.animate(withDuration: 0.1, delay: 0, options: .beginFromCurrentState, animations: {
             self.valueLabel.alpha = alpha
-            self.valueLabel.transform = transform
         }, completion: nil)
     }
 
@@ -222,32 +225,37 @@ class ImageEditorSliderView: UIView, NibLoadable {
 
     @objc private func sliderValueChanged(_ slider: UISlider, event: UIEvent) {
         let sliderValue = self.sliderValue
+
+        if let touchEvent = event.allTouches?.first {
+            switch touchEvent.phase {
+            case .began:
+                isDragging = true
+            case .ended where sliderValue == 0, .cancelled where sliderValue == 0:
+                isDragging = false
+                slider.value = 0
+            default: break
+            }
+        }
+
         updateValueLabel(animated: true)
         delegate?.sliderViewDidChange(self)
 
         if #available(iOS 10.0, *) {
             switch sliderValue {
-            case 0 where !hasEnteredHapticZone:
-                hasEnteredHapticZone = true
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            case 0 where !hasEnteredTapticZone:
+                hasEnteredTapticZone = true
+                TapticEngine.selection.feedback()
             case 0:
                 break
-            case Const.maxSliderValue where !hasEnteredHapticZone,
-                 Const.minSliderValue where !hasEnteredHapticZone:
-                hasEnteredHapticZone = true
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            case Const.maxSliderValue where !hasEnteredTapticZone,
+                 Const.minSliderValue where !hasEnteredTapticZone:
+                hasEnteredTapticZone = true
+                TapticEngine.selection.feedback()
             case Const.maxSliderValue, Const.minSliderValue:
                 break
             default:
-                hasEnteredHapticZone = false
+                hasEnteredTapticZone = false
             }
-        }
-
-        guard let touchEvent = event.allTouches?.first else { return }
-        switch touchEvent.phase {
-        case .ended where sliderValue == 0:
-            slider.value = 0
-        default: break
         }
     }
 }

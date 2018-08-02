@@ -52,6 +52,9 @@ class ImageEditorControlPanel: UIView, NibLoadable {
     private var sliderView: ImageEditorSliderView?
     private var editingMode: EditMode?
 
+    // MARK: - IBOutlets
+
+    @IBOutlet weak var buttonStackView: UIStackView!
 
     // MARK: - IBActions
 
@@ -71,7 +74,6 @@ class ImageEditorControlPanel: UIView, NibLoadable {
 
     private func startEditing(mode: ImageEditorControlPanel.EditMode) {
         editingMode = mode
-        delegate?.imageEditor(self, willBedingEditing: mode)
 
         let sliderView = ImageEditorSliderView.instantiateFromNib()
         sliderView.delegate = self
@@ -83,7 +85,8 @@ class ImageEditorControlPanel: UIView, NibLoadable {
 
         self.sliderView = sliderView
 
-        sliderView.show(animated: true)
+        showSliderView(animated: true)
+        delegate?.imageEditor(self, willBedingEditing: mode)
     }
 
     private func convert(_ sliderValue: Int, to editMode: EditMode) -> Float {
@@ -95,6 +98,32 @@ class ImageEditorControlPanel: UIView, NibLoadable {
         }
     }
 
+    private func showSliderView(animated: Bool) {
+        guard let sliderView = sliderView else { return }
+        sliderView.show(animated: true)
+
+        let animations: () -> Void = {
+            self.buttonStackView.transform = CGAffineTransform(translationX: 0, y: self.buttonStackView.frame.height/2)
+            self.buttonStackView.alpha = 0
+        }
+
+        guard animated else { return animations() }
+        UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseIn, animations: animations, completion: nil)
+    }
+
+    private func hideSliderView(animated: Bool) {
+        guard let sliderView = sliderView else { return }
+        sliderView.hide(animated: animated)
+
+        let animations: () -> Void = {
+            self.buttonStackView.transform = .identity
+            self.buttonStackView.alpha = 1
+        }
+
+        guard animated else { return animations() }
+        UIView.animate(withDuration: 0.3, delay: 0.15, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .beginFromCurrentState, animations: animations, completion: nil)
+    }
+
 }
 
 // MARK: - ImageEditorSliderDelegate Methods
@@ -102,7 +131,7 @@ class ImageEditorControlPanel: UIView, NibLoadable {
 extension ImageEditorControlPanel: ImageEditorSliderDelegate {
 
     func sliderViewDidEndEditing(_ sliderView: ImageEditorSliderView) {
-        sliderView.hide(animated: true)
+        hideSliderView(animated: true)
 
         if let editingMode = editingMode {
             delegate?.imageEditor(self, didEndEditing: editingMode)
@@ -118,7 +147,7 @@ extension ImageEditorControlPanel: ImageEditorSliderDelegate {
     }
 
     func sliderViewDidCancelEditing(_ sliderView: ImageEditorSliderView) {
-        sliderView.hide(animated: true)
+        hideSliderView(animated: true)
 
         if let editingMode = editingMode {
             delegate?.imageEditor(self, didCancelEditing: editingMode)

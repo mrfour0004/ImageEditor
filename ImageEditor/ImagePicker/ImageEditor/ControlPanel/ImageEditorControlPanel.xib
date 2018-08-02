@@ -78,6 +78,9 @@
             <nil key="simulatedBottomBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <connections>
+                <outlet property="buttonStackView" destination="XN4-8H-r8W" id="oTS-sh-9aZ"/>
+            </connections>
             <point key="canvasLocation" x="33.5" y="-219"/>
         </view>
     </objects>

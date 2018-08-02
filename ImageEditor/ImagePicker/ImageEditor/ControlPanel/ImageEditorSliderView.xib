@@ -22,16 +22,31 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rCU-RK-OkG">
                             <rect key="frame" x="0.0" y="0.0" width="375" height="51"/>
                             <subviews>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VFq-20-Fov">
+                                    <rect key="frame" x="185" y="17.5" width="4" height="4"/>
+                                    <color key="backgroundColor" red="0.84705882352941175" green="0.84705882352941175" blue="0.84705882352941175" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="4" id="eR0-gN-INj"/>
+                                        <constraint firstAttribute="height" constant="4" id="g3i-ON-i2Q"/>
+                                    </constraints>
+                                    <userDefinedRuntimeAttributes>
+                                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                            <integer key="value" value="2"/>
+                                        </userDefinedRuntimeAttribute>
+                                    </userDefinedRuntimeAttributes>
+                                </view>
                                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="8VI-Ed-RQM" customClass="Slider" customModule="ImageEditor" customModuleProvider="target">
                                     <rect key="frame" x="22" y="0.0" width="331" height="52"/>
                                 </slider>
                             </subviews>
-                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             <constraints>
+                                <constraint firstItem="VFq-20-Fov" firstAttribute="centerX" secondItem="8VI-Ed-RQM" secondAttribute="centerX" id="574-ns-hKx"/>
                                 <constraint firstAttribute="bottom" secondItem="8VI-Ed-RQM" secondAttribute="bottom" id="F13-XZ-4id"/>
                                 <constraint firstAttribute="trailing" secondItem="8VI-Ed-RQM" secondAttribute="trailing" constant="24" id="Ice-4C-m41"/>
                                 <constraint firstItem="8VI-Ed-RQM" firstAttribute="leading" secondItem="rCU-RK-OkG" secondAttribute="leading" constant="24" id="JhE-M3-QTH"/>
                                 <constraint firstItem="8VI-Ed-RQM" firstAttribute="top" secondItem="rCU-RK-OkG" secondAttribute="top" id="Ob3-wc-sL8"/>
+                                <constraint firstItem="VFq-20-Fov" firstAttribute="centerY" secondItem="8VI-Ed-RQM" secondAttribute="centerY" constant="-6" id="u1v-dJ-nSl"/>
                             </constraints>
                         </view>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="WuQ-LV-o7a">
@@ -42,7 +57,9 @@
                                     <constraints>
                                         <constraint firstAttribute="height" constant="44" id="fKs-JJ-sJr"/>
                                     </constraints>
-                                    <state key="normal" title="Cancel"/>
+                                    <state key="normal" title="Cancel">
+                                        <color key="titleColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25882352941176467" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </state>
                                     <connections>
                                         <action selector="didTapCancelButton:" destination="iN0-l3-epB" eventType="touchUpInside" id="Zrg-za-yyo"/>
                                     </connections>
@@ -52,7 +69,10 @@
                                     <constraints>
                                         <constraint firstAttribute="height" constant="44" id="sEH-6p-k2I"/>
                                     </constraints>
-                                    <state key="normal" title="Done"/>
+                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                    <state key="normal" title="Done">
+                                        <color key="titleColor" red="0.25098039215686274" green="0.25098039215686274" blue="0.25882352941176467" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </state>
                                     <connections>
                                         <action selector="didTapDoneButton:" destination="iN0-l3-epB" eventType="touchUpInside" id="7pY-r8-hAy"/>
                                     </connections>
@@ -60,12 +80,13 @@
                             </subviews>
                         </stackView>
                     </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
                         <constraint firstItem="rCU-RK-OkG" firstAttribute="width" secondItem="L6f-Ho-fka" secondAttribute="width" id="0IY-hM-C2z"/>
                     </constraints>
                 </stackView>
             </subviews>
-            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <constraints>
                 <constraint firstItem="L6f-Ho-fka" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="Grn-YZ-c4E"/>
                 <constraint firstItem="L6f-Ho-fka" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="Q6a-VO-q6i"/>
