@@ -24,6 +24,7 @@ class FocusView: UIView {
     // MARK: - Setup Views
 
     func setup() {
+        isUserInteractionEnabled = false
         layer.borderColor = UIColor.white.cgColor
         layer.borderWidth = 1.5
         layer.cornerRadius = LayoutConfig.size.height / 2

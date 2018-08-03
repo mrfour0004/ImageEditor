@@ -567,8 +567,8 @@ extension CropView {
         let contentFrame = contentBounds
 
         var point = gesturePoint
-        point.x = max(contentFrame.origin.x, point.x)
-        point.y = max(contentFrame.origin.y, point.y)
+        point.x = min(contentFrame.maxX, max(contentFrame.minX, point.x))
+        point.y = min(contentFrame.maxY, max(contentFrame.minY, point.y))
 
         var xDelta = ceil(point.x - panOriginPoint.x)
         var yDelta = ceil(point.y - panOriginPoint.y)
@@ -581,35 +581,40 @@ extension CropView {
         var clampMinFromLeft = false
 
         switch tappedEdge {
-        case .left:
-            if isAspectRatioLockEnabled {
-                isAspectHorizontal = true
-                xDelta = max(xDelta, 0)
-                let scaleOrigin = CGPoint(x: originFrame.maxX, y: originFrame.midY)
-                frame.size.height = frame.size.width / aspectRatio
-                frame.origin.y = scaleOrigin.y - frame.height*CGFloat(0.5)
-            }
+        case .left where isAspectRatioLockEnabled:
+            xDelta = max(xDelta, 0)
+            let scaleOrigin = CGPoint(x: originFrame.maxX, y: originFrame.midY)
+            frame.size.height = frame.size.width / aspectRatio
+            frame.origin.y = scaleOrigin.y - frame.height*CGFloat(0.5)
 
+            frame.origin.x = originFrame.origin.x + xDelta
+            frame.size.width = originFrame.width - xDelta
+
+            isAspectHorizontal = true
+            clampMinFromLeft = true
+        case .left:
             frame.origin.x = originFrame.origin.x + xDelta
             frame.size.width = originFrame.width - xDelta
 
             clampMinFromLeft = true
         case .right where isAspectRatioLockEnabled:
-            isAspectHorizontal = true
             let scaleOrigin = CGPoint(x: originFrame.minX, y: originFrame.midY)
             frame.size.height = frame.size.width / aspectRatio
             frame.origin.y = scaleOrigin.y - frame.height*CGFloat(0.5)
             frame.size.width = originFrame.width + xDelta
             frame.size.width = min(frame.width, contentFrame.height * aspectRatio)
+
+            isAspectHorizontal = true
         case .right:
             frame.size.width = originFrame.width + xDelta
         case .bottom where isAspectRatioLockEnabled:
-            isAspectVertical = true
             let scaleOrigin = CGPoint(x: originFrame.midX, y: originFrame.minY)
             frame.size.width = frame.height * aspectRatio
             frame.origin.x = scaleOrigin.x - frame.width*CGFloat(0.5)
             frame.size.height = originFrame.height + yDelta
             frame.size.height = min(frame.height, contentFrame.width / aspectRatio)
+
+            isAspectVertical = true
         case .bottom:
             frame.size.height = originFrame.height + yDelta
         case .top where isAspectRatioLockEnabled:
@@ -675,13 +680,13 @@ extension CropView {
             clampMinFromTop = true
         case .bottomLeft where isAspectRatioLockEnabled:
             var distance: CGPoint = .zero
-            distance.x = 1.0 - (xDelta / originFrame.width)
-            distance.y = 1.0 - (-yDelta / originFrame.height)
+            distance.x = CGFloat(1.0) - (xDelta / originFrame.width)
+            distance.y = CGFloat(1.0) - (-yDelta / originFrame.height)
 
-            let scale: CGFloat = (distance.x + distance.y) * CGFloat(0.5)
+            let scale = (distance.x + distance.y) * CGFloat(0.5)
 
-            frame.size.width = ceil(originFrame.width * scale)
-            frame.size.height = ceil(originFrame.height * scale)
+            frame.size.width = ceil(originFrame.width) * scale
+            frame.size.height = ceil(originFrame.height) * scale
             frame.origin.x = originFrame.maxX - frame.width
 
             isAspectVertical = true
@@ -714,12 +719,12 @@ extension CropView {
 
         if isAspectRatioLockEnabled && isAspectHorizontal {
             maxSize.height = contentFrame.width / aspectRatio
-            minSize.width = Const.cropViewMinimumBoxSize.width / aspectRatio
+            minSize.width = Const.cropViewMinimumBoxSize.height * aspectRatio
         }
 
         if isAspectRatioLockEnabled && isAspectVertical {
-            maxSize.width = contentFrame.height / aspectRatio
-            minSize.height = Const.cropViewMinimumBoxSize.height / aspectRatio
+            maxSize.width = contentFrame.height * aspectRatio
+            minSize.height = Const.cropViewMinimumBoxSize.width / aspectRatio
         }
 
         frame.size.width = max(frame.width, minSize.width)
@@ -1177,6 +1182,12 @@ extension CropView: UIGestureRecognizerDelegate {
 
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         guard gestureRecognizer == gridPanGestureRecognizer else { return true }
+
+        // FIXME: Enable pan gesture when isAspectRatioLockEnabled is true
+        // layout incorrect cropBoxFrame when isAspectRatioLockEnabled is true
+        // to disable pan gesture until this issue is fixed.
+        guard !isAspectRatioLockEnabled else { return false}
+
         let tapPoint = gestureRecognizer.location(in: self)
 
         let frame = gridOverlayView.frame
