@@ -16,6 +16,7 @@
 		5E35539E20E75B140089F433 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5E35539C20E75B140089F433 /* Main.storyboard */; };
 		5E3553A020E75B150089F433 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5E35539F20E75B150089F433 /* Assets.xcassets */; };
 		5E3553A320E75B150089F433 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5E3553A120E75B150089F433 /* LaunchScreen.storyboard */; };
+		5E42BAD1211755C000681F5A /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E42BAD0211755C000681F5A /* ImageViewController.swift */; };
 		5E4476D1210776FA00889636 /* ImageEditorControlPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4476D0210776FA00889636 /* ImageEditorControlPanel.swift */; };
 		5E4476D32107773400889636 /* ImageEditorControlPanel.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5E4476D22107773400889636 /* ImageEditorControlPanel.xib */; };
 		5E4476D7210781C100889636 /* ImageEditorControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E4476D6210781C100889636 /* ImageEditorControlButton.swift */; };
@@ -60,6 +61,7 @@
 		5E35539F20E75B150089F433 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5E3553A220E75B150089F433 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5E3553A420E75B150089F433 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5E42BAD0211755C000681F5A /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewController.swift; sourceTree = "<group>"; };
 		5E4476D0210776FA00889636 /* ImageEditorControlPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditorControlPanel.swift; sourceTree = "<group>"; };
 		5E4476D22107773400889636 /* ImageEditorControlPanel.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ImageEditorControlPanel.xib; sourceTree = "<group>"; };
 		5E4476D6210781C100889636 /* ImageEditorControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditorControlButton.swift; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 				5E35539820E75B140089F433 /* AppDelegate.swift */,
 				5E35539A20E75B140089F433 /* ViewController.swift */,
 				5E35539C20E75B140089F433 /* Main.storyboard */,
+				5E42BACF2117559800681F5A /* ImageViewController */,
 				5E5894CB20EFAC9A00193CEB /* ImagePicker */,
 				5E3553AA20E75B1D0089F433 /* Supporting Files */,
 			);
@@ -166,6 +169,14 @@
 				5E3553A420E75B150089F433 /* Info.plist */,
 			);
 			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		5E42BACF2117559800681F5A /* ImageViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5E42BAD0211755C000681F5A /* ImageViewController.swift */,
+			);
+			path = ImageViewController;
 			sourceTree = "<group>";
 		};
 		5E4476CD2107769F00889636 /* ControlPanel */ = {
@@ -389,6 +400,7 @@
 				5E1A23F7210B514700A52346 /* CropAspectRatio.swift in Sources */,
 				5E8CB0DD210F02BA009B5C02 /* ImageEditorSliderView.swift in Sources */,
 				5E35539920E75B140089F433 /* AppDelegate.swift in Sources */,
+				5E42BAD1211755C000681F5A /* ImageViewController.swift in Sources */,
 				5E10B8D220FF840500E8838C /* CropView.swift in Sources */,
 				5E10B8D020FF832400E8838C /* CropScrollView.swift in Sources */,
 				5E5894D920F0C25C00193CEB /* AVCaptureDevice+Extension.swift in Sources */,

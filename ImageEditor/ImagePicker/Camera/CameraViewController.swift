@@ -11,6 +11,13 @@ import AVFoundation
 
 class CameraViewController: UIViewController, StoryboardLoadable {
 
+    open var alertTitle: String? = nil
+    open var alertErrorTitle: String? = nil
+    open var alertConfirmTitle = NSLocalizedString("OK", comment: "")
+    open var alertSettingsTitle = NSLocalizedString("Settings", comment: "")
+    open var cameraPermissionRequestMessage = NSLocalizedString("AVCam doesn't have permission to use the camera, please change privacy settings", comment: "Alert message when the user has denied access to the camera")
+    open var configurSessionFailureMessage = NSLocalizedString("Unable to capture media", comment: "Alert message when something goes wrong during capture session configuration")
+
     // MARK: - Session Management
 
     private enum SessionSetupResult {
@@ -47,6 +54,8 @@ class CameraViewController: UIViewController, StoryboardLoadable {
 
     @IBAction private func didClickShutterButton(_ sender: Any) {
         guard !isCapturingPhoto else { return }
+        guard setupResult == .success else { return requestCameraPermission() }
+        isCapturingPhoto = true
         isCapturingPhoto = true
 
         capturePhoto { [unowned self] image in
@@ -427,7 +436,18 @@ private extension CameraViewController {
     }
 
     func requestCameraPermission() {
-        // present alert or something
+        let message = cameraPermissionRequestMessage
+        let alertController = UIAlertController(title: self.alertTitle, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: self.alertConfirmTitle, style: .cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: self.alertSettingsTitle, style: .default, handler: { action in
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(URL(string: UIApplicationOpenSettingsURLString)!, options: [:], completionHandler: nil)
+            } else if let url = URL(string: UIApplicationOpenSettingsURLString), UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.openURL(url)
+            }
+        }))
+
+        self.present(alertController, animated: true, completion: nil)
     }
 
     func addObservers() {
@@ -477,7 +497,9 @@ extension CameraViewController: UIImagePickerControllerDelegate, UINavigationCon
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
         //imagePicker.modalPresentationStyle = .overFullScreen
-        showTranslucencyView(animated: true)
+        if setupResult == .success {
+            showTranslucencyView(animated: true)
+        }
         self.present(imagePicker, animated: true, completion: nil)
     }
 

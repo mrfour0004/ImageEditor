@@ -17,13 +17,22 @@ class ImagePickerController: UINavigationController {
 
     // MARK: - Properties
 
+    weak var pickerDelegate: ImagePickerControllerDelegate?
+
     /// A Boolean value indicating whether the user is allowed to edit a selected still image. This property is set to `false` by default.
     var allowsEditing = false
     var cropAspectRatioPreset: CropAspectRatioPreset = .original
     var isAspectRatioLockEnabled: Bool = false
-    private var transitionController: ImagePickerControllerTransitioning?
 
-    weak var pickerDelegate: ImagePickerControllerDelegate?
+    var shouldStatusBarHidden = false {
+        didSet {
+            UIView.animate(withDuration: Double(UINavigationControllerHideShowBarDuration)) {
+                self.setNeedsStatusBarAppearanceUpdate()
+            }
+        }
+    }
+
+    private var transitionController: ImagePickerControllerTransitioning?
 
     // MARK: - View Lifecycle
 
@@ -36,6 +45,38 @@ class ImagePickerController: UINavigationController {
         super.viewDidLoad()
         delegate = self
         interactivePopGestureRecognizer?.delegate = self
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        UIView.animate(withDuration: Double(UINavigationControllerHideShowBarDuration)) {
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        shouldStatusBarHidden = false
+        super.viewWillDisappear(animated)
+    }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
+
+    override var childViewControllerForStatusBarStyle: UIViewController? {
+        return nil
+    }
+
+    override var childViewControllerForStatusBarHidden: UIViewController? {
+        return nil
+    }
+
+    override var prefersStatusBarHidden: Bool {
+        return shouldStatusBarHidden
+    }
+
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .slide
     }
 
     // MARK: - Methods
@@ -73,6 +114,14 @@ extension ImagePickerController: UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         navigationController.setNavigationBarHidden(needsHideNavigationBarWhenShowing(toVC), animated: true)
         return nil
+    }
+
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        if viewController is CameraViewController {
+            shouldStatusBarHidden = true
+        } else {
+            shouldStatusBarHidden = false
+        }
     }
 
     private func needsHideNavigationBarWhenShowing(_ viewController: UIViewController) -> Bool{
