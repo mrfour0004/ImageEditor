@@ -13,6 +13,13 @@ class ImageViewController: UIViewController {
     // MARK: - Properties
 
     private let image: UIImage
+    private var needsHideStatusBar = false {
+        didSet {
+            UIView.animate(withDuration: Double(UINavigationControllerHideShowBarDuration), delay: 0, options: .curveEaseInOut, animations: {
+                self.setNeedsStatusBarAppearanceUpdate()
+            }, completion: nil)
+        }
+    }
 
     // MARK: - Views
 
@@ -35,8 +42,21 @@ class ImageViewController: UIViewController {
         setupViews()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        needsHideStatusBar = true
+    }
+
     override func viewWillLayoutSubviews() {
         setupZoomScale()
+    }
+
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return .slide
+    }
+
+    override var prefersStatusBarHidden: Bool {
+        return needsHideStatusBar
     }
 
     // MARK: - Setup Views
@@ -44,6 +64,11 @@ class ImageViewController: UIViewController {
     private func setupViews() {
         imageView = UIImageView(image: image)
 
+        setupScrollView()
+        setupCloseButton()
+    }
+
+    private func setupScrollView() {
         scrollView = UIScrollView(frame: view.bounds)
         scrollView.backgroundColor = .black
         scrollView.contentSize = imageView.bounds.size
@@ -56,6 +81,27 @@ class ImageViewController: UIViewController {
         view.addSubview(scrollView)
     }
 
+    private func setupCloseButton() {
+        let closeButton = UIButton()
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        closeButton.setImage(#imageLiteral(resourceName: "ic_close_white"), for: .normal)
+        closeButton.addTarget(self, action: #selector(didTapCloseButton), for: .touchUpInside)
+
+        view.addSubview(closeButton)
+
+        var constraints = [
+            closeButton.heightAnchor.constraint(equalToConstant: 40),
+            closeButton.widthAnchor.constraint(equalTo: closeButton.heightAnchor),
+            closeButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12)
+        ]
+        if #available(iOS 11.0, *) {
+            constraints.append(closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12))
+        } else {
+            constraints.append(closeButton.topAnchor.constraint(equalTo: topLayoutGuide.bottomAnchor, constant: 12))
+        }
+        NSLayoutConstraint.activate(constraints)
+    }
+
     private func setupZoomScale() {
         let imageViewSize = imageView.bounds.size
         let scrollViewSize = scrollView.bounds.size
@@ -66,6 +112,14 @@ class ImageViewController: UIViewController {
         scrollView.minimumZoomScale = min(widthScale, heightScale)
         scrollView.zoomScale = scrollView.minimumZoomScale
     }
+
+    // MARK: - Private Methods
+
+    @objc private func didTapCloseButton(_ button: UIButton) {
+        needsHideStatusBar = false
+        dismiss(animated: true, completion: nil)
+    }
+
 }
 
 // MARK: - UIScrollViewDelegate Methods

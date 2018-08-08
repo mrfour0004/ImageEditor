@@ -8,17 +8,21 @@
 
 import UIKit
 import AVFoundation
-import CLImageEditor
 
 class ViewController: UIViewController {
 
-    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet weak var imageView: UIImageView! {
+        didSet {
+            imageView.isUserInteractionEnabled = true
+            imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapImageView)))
+        }
+    }
     
     @IBAction private func presentImageEditor(_ sender: Any) {
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
-        imagePicker.sourceType = .camera
-
+        imagePicker.sourceType = .photoLibrary
+        
         present(imagePicker, animated: true, completion: nil)
     }
 
@@ -26,10 +30,17 @@ class ViewController: UIViewController {
         let picker = ImagePickerController()
         picker.pickerDelegate = self
         picker.allowsEditing = true
-        picker.cropAspectRatioPreset = .square
-        picker.isAspectRatioLockEnabled = true
+//        picker.cropAspectRatioPreset = .square
+//        picker.cropAspectRatioPreset = .custom(CGSize(width: 328, height: 200))
+//        picker.isAspectRatioLockEnabled = true
 
         present(picker, animated: true, completion: nil)
+    }
+
+    @objc func didTapImageView(_ gesture: UITapGestureRecognizer) {
+        guard let image = imageView.image else { return }
+        let imageViewController = ImageViewController(image: image)
+        present(imageViewController, animated: true, completion: nil)
     }
 
     @objc func dismissSelf() {
@@ -41,12 +52,8 @@ class ViewController: UIViewController {
 extension ViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         let image = info[UIImagePickerControllerOriginalImage] as! UIImage
-
-        let imageEditor = CLImageEditor(image: image, delegate: self)!
-        imageEditor.navigationItem.hidesBackButton = true
-        imageEditor.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.cancel, target: self, action: #selector(dismissSelf))
-
-        picker.pushViewController(imageEditor, animated: true)
+        imageView.image = image
+        picker.dismiss(animated: true, completion: nil)
     }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -73,13 +80,3 @@ extension ViewController: ImagePickerControllerDelegate {
     }
 }
 
-extension ViewController: CLImageEditorDelegate {
-    func imageEditor(_ editor: CLImageEditor!, didFinishEditingWith image: UIImage!) {
-        imageView.image = image
-        editor.dismiss(animated: true, completion: nil)
-    }
-
-    func imageEditorDidCancel(_ editor: CLImageEditor!) {
-        editor.dismiss(animated: true, completion: nil)
-    }
-}
