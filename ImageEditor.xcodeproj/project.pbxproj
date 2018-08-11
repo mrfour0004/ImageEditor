@@ -29,6 +29,9 @@
 		5E5894D520F0866700193CEB /* PhotoCaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5894D420F0866700193CEB /* PhotoCaptureProcessor.swift */; };
 		5E5894D720F0C22F00193CEB /* AVCaptureVideoOrientation+UIOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5894D620F0C22F00193CEB /* AVCaptureVideoOrientation+UIOrientation.swift */; };
 		5E5894D920F0C25C00193CEB /* AVCaptureDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E5894D820F0C25C00193CEB /* AVCaptureDevice+Extension.swift */; };
+		5E72E04B211ED6F80089AA7D /* CGSize+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E72E04A211ED6F80089AA7D /* CGSize+Extension.swift */; };
+		5E7D3B74211B43D1006D711C /* ImageViewPresentAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7D3B73211B43D1006D711C /* ImageViewPresentAnimator.swift */; };
+		5E7D3B76211B43F3006D711C /* ImageViewDismissAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7D3B75211B43F3006D711C /* ImageViewDismissAnimator.swift */; };
 		5E885D9D21129D73008F017B /* TapticEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E885D9C21129D73008F017B /* TapticEngine.swift */; };
 		5E8BC5E420FDAB4F00C0AFD4 /* ImagePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BC5E320FDAB4F00C0AFD4 /* ImagePickerController.swift */; };
 		5E8BC5EC20FDE4E700C0AFD4 /* ImageEditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BC5EB20FDE4E700C0AFD4 /* ImageEditorViewController.swift */; };
@@ -72,6 +75,9 @@
 		5E5894D420F0866700193CEB /* PhotoCaptureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureProcessor.swift; sourceTree = "<group>"; };
 		5E5894D620F0C22F00193CEB /* AVCaptureVideoOrientation+UIOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVCaptureVideoOrientation+UIOrientation.swift"; sourceTree = "<group>"; };
 		5E5894D820F0C25C00193CEB /* AVCaptureDevice+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVCaptureDevice+Extension.swift"; sourceTree = "<group>"; };
+		5E72E04A211ED6F80089AA7D /* CGSize+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGSize+Extension.swift"; sourceTree = "<group>"; };
+		5E7D3B73211B43D1006D711C /* ImageViewPresentAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewPresentAnimator.swift; sourceTree = "<group>"; };
+		5E7D3B75211B43F3006D711C /* ImageViewDismissAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewDismissAnimator.swift; sourceTree = "<group>"; };
 		5E885D9C21129D73008F017B /* TapticEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TapticEngine.swift; sourceTree = "<group>"; };
 		5E8BC5E320FDAB4F00C0AFD4 /* ImagePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerController.swift; sourceTree = "<group>"; };
 		5E8BC5EB20FDE4E700C0AFD4 /* ImageEditorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEditorViewController.swift; sourceTree = "<group>"; };
@@ -160,6 +166,8 @@
 			isa = PBXGroup;
 			children = (
 				5E42BAD0211755C000681F5A /* ImageViewController.swift */,
+				5E7D3B73211B43D1006D711C /* ImageViewPresentAnimator.swift */,
+				5E7D3B75211B43F3006D711C /* ImageViewDismissAnimator.swift */,
 			);
 			path = ImageViewController;
 			sourceTree = "<group>";
@@ -239,6 +247,7 @@
 				5E8BC5ED20FDEEBD00C0AFD4 /* UIImage+CropRotate.swift */,
 				5EDE5E6720F9C99D00614CE9 /* UIImage+Extension.swift */,
 				5EA2F791210FFDA300325CC5 /* UISlider+Extension.swift */,
+				5E72E04A211ED6F80089AA7D /* CGSize+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -321,6 +330,7 @@
 			files = (
 				5E8BC5EC20FDE4E700C0AFD4 /* ImageEditorViewController.swift in Sources */,
 				5E5054A32112C2FA0055E17F /* Optional+NilCoalescing.swift in Sources */,
+				5E72E04B211ED6F80089AA7D /* CGSize+Extension.swift in Sources */,
 				5E5894D720F0C22F00193CEB /* AVCaptureVideoOrientation+UIOrientation.swift in Sources */,
 				5E8BC5EE20FDEEBD00C0AFD4 /* UIImage+CropRotate.swift in Sources */,
 				5EDE5E6A20F9CF9800614CE9 /* FlashMode+UIImage.swift in Sources */,
@@ -331,6 +341,7 @@
 				5E8BC5E420FDAB4F00C0AFD4 /* ImagePickerController.swift in Sources */,
 				5EA2F792210FFDA300325CC5 /* UISlider+Extension.swift in Sources */,
 				5E8BC5FD20FF5C6E00C0AFD4 /* NavigationInterruptible.swift in Sources */,
+				5E7D3B76211B43F3006D711C /* ImageViewDismissAnimator.swift in Sources */,
 				5E10B8D421000E3D00E8838C /* CropOverlayView.swift in Sources */,
 				5E4477112108BB2500889636 /* NibLoadable.swift in Sources */,
 				5E1A23F7210B514700A52346 /* CropAspectRatio.swift in Sources */,
@@ -338,6 +349,7 @@
 				5E35539920E75B140089F433 /* AppDelegate.swift in Sources */,
 				5E42BAD1211755C000681F5A /* ImageViewController.swift in Sources */,
 				5E10B8D220FF840500E8838C /* CropView.swift in Sources */,
+				5E7D3B74211B43D1006D711C /* ImageViewPresentAnimator.swift in Sources */,
 				5E10B8D020FF832400E8838C /* CropScrollView.swift in Sources */,
 				5E5894D920F0C25C00193CEB /* AVCaptureDevice+Extension.swift in Sources */,
 				5EDE5E6820F9C99D00614CE9 /* UIImage+Extension.swift in Sources */,

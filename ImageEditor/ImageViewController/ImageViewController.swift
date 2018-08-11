@@ -12,6 +12,9 @@ class ImageViewController: UIViewController {
 
     // MARK: - Properties
 
+    var sourceView: UIImageView?
+    let closeButton = UIButton()
+
     private let image: UIImage
     private var needsHideStatusBar = false {
         didSet {
@@ -24,13 +27,14 @@ class ImageViewController: UIViewController {
     // MARK: - Views
 
     private var scrollView: UIScrollView!
-    private var imageView: UIImageView!
+    var imageView: UIImageView!
 
     // MARK: - View Lifecycle
 
     init(image: UIImage) {
         self.image = image
         super.init(nibName: nil, bundle: nil)
+        transitioningDelegate = self
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -45,6 +49,13 @@ class ImageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         needsHideStatusBar = true
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        UIView.animate(withDuration: 0.15, animations: {
+            self.closeButton.alpha = 1
+        })
     }
 
     override func viewWillLayoutSubviews() {
@@ -76,16 +87,22 @@ class ImageViewController: UIViewController {
         scrollView.delegate = self
         scrollView.alwaysBounceVertical = true
         scrollView.alwaysBounceHorizontal = true
+        if #available(iOS 11.0, *) {
+            scrollView.contentInsetAdjustmentBehavior = .never
+        } else {
+            automaticallyAdjustsScrollViewInsets = false
+        }
 
         scrollView.addSubview(imageView)
         view.addSubview(scrollView)
     }
 
     private func setupCloseButton() {
-        let closeButton = UIButton()
+
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.setImage(#imageLiteral(resourceName: "ic_close_white"), for: .normal)
         closeButton.addTarget(self, action: #selector(didTapCloseButton), for: .touchUpInside)
+        closeButton.alpha = 0
 
         view.addSubview(closeButton)
 
@@ -140,4 +157,18 @@ extension ImageViewController: UIScrollViewDelegate {
     }
 }
 
+// MARK: - UIViewControllerTransitioningDelegate Methods
 
+extension ImageViewController: UIViewControllerTransitioningDelegate {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let sourceView = sourceView else { return nil }
+        return ImageViewPresentAnimator(imageView: imageView, sourceView: sourceView)
+    }
+
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        guard let sourceView = sourceView else { return nil }
+
+        let imageViewFrame = imageView.superview!.convert(imageView.frame, to: (UIApplication.shared.delegate?.window).or(view))
+        return ImageViewDismissAnimator(imageView: imageView, imageFrame: imageViewFrame, sourceView: sourceView)
+    }
+}

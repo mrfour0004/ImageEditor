@@ -67,7 +67,10 @@ class CameraViewController: UIViewController, StoryboardLoadable {
                 imageEditorViewController.image = image
                 imagePicker.pushViewController(imageEditorViewController, animated: true)
             } else {
-                imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: image)
+                // Somehow the original image behave weird when presenting with animation,
+                // but cropping it dose the trick.🤔
+                let croppedImage = image.cropped(with: CGRect(origin: .zero, size: image.size), angle: 0)
+                imagePicker.pickerDelegate?.imagePicker(imagePicker, didFinishPickingImage: croppedImage)
             }
         }
     }
@@ -221,11 +224,6 @@ class CameraViewController: UIViewController, StoryboardLoadable {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         startRunningSession()
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
     }
 
     override func viewWillDisappear(_ animated: Bool) {
