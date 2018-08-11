@@ -40,6 +40,7 @@ class ViewController: UIViewController {
     @objc func didTapImageView(_ gesture: UITapGestureRecognizer) {
         guard let image = imageView.image else { return }
         let imageViewController = ImageViewController(image: image)
+        imageViewController.sourceView = imageView
         present(imageViewController, animated: true, completion: nil)
     }
 

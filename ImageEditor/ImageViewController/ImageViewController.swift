@@ -35,6 +35,8 @@ class ImageViewController: UIViewController {
         self.image = image
         super.init(nibName: nil, bundle: nil)
         transitioningDelegate = self
+
+        setupViews()
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -43,7 +45,6 @@ class ImageViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViews()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -73,6 +74,7 @@ class ImageViewController: UIViewController {
     // MARK: - Setup Views
 
     private func setupViews() {
+        view.backgroundColor = .clear
         imageView = UIImageView(image: image)
 
         setupScrollView()
@@ -133,6 +135,11 @@ class ImageViewController: UIViewController {
     // MARK: - Private Methods
 
     @objc private func didTapCloseButton(_ button: UIButton) {
+        dismiss()
+    }
+
+    private func dismiss() {
+        closeButton.isHidden = true
         needsHideStatusBar = false
         dismiss(animated: true, completion: nil)
     }
@@ -154,6 +161,25 @@ extension ImageViewController: UIScrollViewDelegate {
         let horizontalPadding = max(0, (scrollViewSize.width - imageViewSize.width) / 2)
 
         scrollView.contentInset = UIEdgeInsets(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
+    }
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard scrollView.zoomScale == scrollView.minimumZoomScale else { return }
+        let contentOffsetY = scrollView.contentInset.top + scrollView.contentOffset.y
+        let rate = abs(contentOffsetY / scrollView.frame.height)
+
+        //let scale = scrollView.zoomScale * max(1 - rate, 0.9)
+        //imageView.transform = CGAffineTransform(scaleX: scale, y: scale)
+        scrollView.backgroundColor = UIColor.black.withAlphaComponent(1 - rate)
+    }
+
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        guard scrollView.zoomScale == scrollView.minimumZoomScale else { return }
+        let contentOffsetY = scrollView.contentInset.top + scrollView.contentOffset.y
+
+        if contentOffsetY < -50 {
+            dismiss()
+        }
     }
 }
 

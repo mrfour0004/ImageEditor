@@ -26,6 +26,7 @@ extension ImageViewPresentAnimator: UIViewControllerAnimatedTransitioning {
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         let containerView = transitionContext.containerView
         let imageViewController = transitionContext.viewController(forKey: .to)!
+        let presentingViewController = transitionContext.viewController(forKey: .from)!
 
         containerView.addSubview(imageViewController.view)
 
@@ -44,6 +45,11 @@ extension ImageViewPresentAnimator: UIViewControllerAnimatedTransitioning {
 
         imageView.alpha = 0
         sourceView.alpha = 0
+
+        if let presentingViewSnapshot = presentingViewController.view.snapshotView(afterScreenUpdates: true) {
+            imageViewController.view.insertSubview(presentingViewSnapshot, at: 0)
+        }
+
         imageViewController.view.alpha = 0
         UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: [], animations: {
             transitionImageView.frame = imageViewFrame
@@ -52,7 +58,6 @@ extension ImageViewPresentAnimator: UIViewControllerAnimatedTransitioning {
             UIView.animate(withDuration: 0.1, animations: {
                 transitionImageView.alpha = 0
             }, completion: { _ in
-                self.sourceView.alpha = 1
                 transitionImageView.removeFromSuperview()
             })
         })
